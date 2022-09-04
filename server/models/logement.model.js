@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const logementSchema = Schema({
     addresse: String,
+    ville: String,
     description: String,
     logement: String,
     voyageurs: Number,
@@ -13,8 +14,13 @@ const logementSchema = Schema({
     annonceur: String,
     prix: Number,
     equipements: [String],
-    images: [String]
+    images: [String],
+    fumeur: Boolean,
+    animaux: Boolean,
+    access_handicap: Boolean
 });
+
+logementSchema.set('timestamps', true);
 
 const Logement = mongoose.model('logement', logementSchema);
 
@@ -23,6 +29,7 @@ module.exports = Logement;
 module.exports.newLogement = function (req) {
     const newLogement = new Logement({
         addresse: req.body.addresse,
+        ville: req.body.ville,
         description: req.body.description,
         logement: req.body.logement,
         voyageurs: req.body.voyageurs,
@@ -33,6 +40,9 @@ module.exports.newLogement = function (req) {
         annonceur: req.body.annonceur,
         prix: req.body.prix,
         equipements: req.body.equipements,
+        fumeur: req.body.fumeur,
+        animaux: req.body.animaux,
+        access_handicap: req.body.access_handicap,
         images: null
     });
     return newLogement;
@@ -41,6 +51,7 @@ module.exports.newLogement = function (req) {
 module.exports.editLogement = function (req) {
     const editLogement = {
         addresse: req.body.addresse,
+        ville: req.body.ville,
         description: req.body.description,
         logement: req.body.logement,
         voyageurs: req.body.voyageurs,
@@ -51,6 +62,9 @@ module.exports.editLogement = function (req) {
         annonceur: req.body.annonceur,
         prix: req.body.prix,
         equipements: req.body.equipements,
+        fumeur: req.body.fumeur,
+        animaux: req.body.animaux,
+        access_handicap: req.body.access_handicap,
         images: req.body.images
     };
     return editLogement;

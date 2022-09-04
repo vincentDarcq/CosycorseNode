@@ -12,6 +12,10 @@ exports.getLogementByAnnonceur = (annonceur) => {
   return Logement.find({ annonceur: annonceur}).exec();
 }
 
+exports.getLogementsByVilleRecentToOld = (ville) => {
+  return Logement.find({ ville: ville}).sort({createdAt: -1}).exec();
+}
+
 exports.getLogementById = (logementId) => {
   return Logement.findById(logementId).exec();
 }

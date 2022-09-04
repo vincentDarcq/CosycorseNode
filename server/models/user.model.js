@@ -7,6 +7,8 @@ const userSchema = Schema({
     password: String
 });
 
+userSchema.set('timestamps', true);
+
 const User = mongoose.model('user', userSchema);
 
 module.exports = User;

@@ -1,12 +1,14 @@
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
+const { villes } = require('../models/villes');
 const {
     createLogement,
     findByIdAndUpdate,
     getLogementByAnnonceur,
     deleteOne,
-    getLogementById
+    getLogementById,
+    getLogementsByVilleRecentToOld
 } = require('../queries/logement.queries');
 
 const {
@@ -22,6 +24,17 @@ exports.create = async (req, res) => {
 
 exports.getByAnnonceur = async (req, res) => {
     const logements = await getLogementByAnnonceur(req.query.annonceur);
+    res.status(200).json(logements);
+}
+
+exports.getRecentLogement = async (req, res) => {
+    let logements = [];
+    for(let ville of villes){
+        const l = await getLogementsByVilleRecentToOld(ville);
+        if(l.length > 0){
+            logements.push(l[0]);
+        }
+    }
     res.status(200).json(logements);
 }
 
@@ -47,6 +60,9 @@ exports.deleteImage = async (req, res) => {
 exports.uploadImages = async (req, res) => {
     util.inspect(req.files, { compact: false, depth: 5, breakLength: 80, color: true });
     const logement = await getLogementById(req.query.logementId);
+    if(logement.images === null){
+        logement.images = [];
+    }
     if(req.files.image1){
         if(logement.images && logement.images[0]){
             deleteImage(logement.images[0]);
