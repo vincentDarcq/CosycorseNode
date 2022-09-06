@@ -7,7 +7,8 @@ const {
     deleteLogement,
     deleteImage,
     updateLogement,
-    getRecentLogement
+    getRecentLogement,
+    getRecentLogementForVille
 } = require('../controllers/logement')
 
 router.post('/create', create);
@@ -17,6 +18,7 @@ router.post('/uploadImages', storage.fields([{ name: 'image1' }, { name: 'image2
             uploadImages)
 router.get('/getByAnnonceur', getByAnnonceur);
 router.get('/getRandom', getRecentLogement);
+router.get('/getRandomForVille', getRecentLogementForVille);
 router.get('/delete', deleteLogement);
 router.post('/update', updateLogement);
 router.get('/deleteImage', deleteImage);

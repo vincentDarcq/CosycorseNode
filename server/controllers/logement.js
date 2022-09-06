@@ -38,6 +38,15 @@ exports.getRecentLogement = async (req, res) => {
     res.status(200).json(logements);
 }
 
+exports.getRecentLogementForVille = async (req, res) => {
+    const l = await getLogementsByVilleRecentToOld(req.query.ville);
+    if(l.length > 0){
+        res.status(200).json(l[0]);
+    }else{
+        res.status(200).json(null);
+    }
+}
+
 exports.deleteLogement = async (req, res) => {
     const logementDeleted = await deleteOne(req.query.logementId);
     res.status(200).json(logementDeleted);
