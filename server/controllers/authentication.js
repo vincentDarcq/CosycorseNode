@@ -1,6 +1,6 @@
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 
 const RSA_PUBLIC_KEY = fs.readFileSync('./rsa/key.pub');

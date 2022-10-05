@@ -2,6 +2,7 @@ const path = require('path');
 const img = path.join(__dirname, './upload');
 const pass = require('./rsa/mongopass');
 const index = require('./routes/index');
+const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
@@ -19,6 +20,7 @@ app.use(cors({
     'preflightContinue': false
 }));
 
+app.use(logger('dev'));
 //parser les objets qu'on envoie via les requêtes POST
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

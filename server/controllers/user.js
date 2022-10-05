@@ -8,7 +8,7 @@ const {
   deleteUserByMail
 } = require('../queries/user.queries');
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 exports.uploadPicture = async (req, res, next) => {
   util.inspect(req.files, { compact: false, depth: 5, breakLength: 80, color: true });
