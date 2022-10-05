@@ -1,6 +1,8 @@
 const nodeMailer = require('nodemailer');
-const user = 'vincent.darcqf78@gmail.com';
-const pass = 'inpgkijxmhklkeio';
+const {
+  user,
+  pass
+} = require('../rsa/nodemailerpass');
 const { getUserByName } = require('../queries/user.queries');
 
 exports.sendMail = async (req, res, next) => {
