@@ -5,7 +5,10 @@ const logementReservationSchema = Schema({
     dateDebut: String,
     dateFin: String,
     emailDemandeur: String,
-    logementId: { type: Schema.Types.ObjectId, ref: "logement" }
+    prix: Number,
+    message: String,
+    annonceur: String,
+    logementId: { type: Schema.Types.ObjectId, ref: "logement" },
 });
 
 logementReservationSchema.set('timestamps', true);
@@ -15,10 +18,13 @@ const LogementReservation = mongoose.model('logement_reservation', logementReser
 module.exports = LogementReservation;
 
 module.exports.newLogementReservation = function (req) {
-    const newLogement = new Logement({
+    const newLogement = new LogementReservation({
         dateDebut: req.body.dateDebut,
         dateFin: req.body.dateFin,
+        message: req.body.message,
+        prix: req.body.prix,
         emailDemandeur: req.body.emailDemandeur,
+        annonceur: req.body.annonceur,
         logementId: req.body.logementId
     });
     return newLogement;
@@ -29,6 +35,7 @@ module.exports.editLogementReservation = function (req) {
         dateDebut: req.body.dateDebut,
         dateFin: req.body.dateFin,
         emailDemandeur: req.body.emailDemandeur,
+        annonceur: req.body.annonceur,
         logementId: req.body.logementId
     };
     return editLogement;

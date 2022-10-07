@@ -1,6 +1,11 @@
 const LogementReservation = require('../models/logement_reservation.model');
+const ObjectId = require('mongodb').ObjectId;
 
-exports.createLogementReservation = (LogementReservation, res) => {
-    return LogementReservation.save();
-  }
+exports.createLogementReservation = (logementReservation) => {
+  return logementReservation.save();
+}
+
+exports.getReservationsBylogementId = (logementId) => {
+  return LogementReservation.find({ logementId : ObjectId(logementId) }).exec();
+}
   

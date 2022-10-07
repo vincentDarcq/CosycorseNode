@@ -1,9 +1,10 @@
 const router = require('express').Router();
-const { sendMail } = require('../controllers/emails');
-
+const { 
+    contactHost
+ } = require('../controllers/emails');
 
 
 //router.post('/forgotPass', forgotPassword);
-router.post('/send-email', sendMail);
+router.post('/contactHost', contactHost);
 
 module.exports = router;

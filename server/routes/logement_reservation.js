@@ -1,8 +1,13 @@
 const router = require('express').Router();
 const {
-    create
-} = require('../controllers/logement_reservation')
+    create,
+    getReservations
+} = require('../controllers/logement_reservation');
+const { 
+    sendMailForBooking
+ } = require('../controllers/emails');
 
-router.post('/create', create);
+router.post('/create', create, sendMailForBooking);
+router.get('/getReservations', getReservations);
 
 module.exports = router;
