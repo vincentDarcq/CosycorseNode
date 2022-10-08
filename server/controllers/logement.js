@@ -8,7 +8,8 @@ const {
     getLogementByAnnonceur,
     deleteOne,
     getLogementById,
-    getLogementsByVilleRecentToOld
+    getLogementsByVilleRecentToOld,
+    getLogementsByFiltres
 } = require('../queries/logement.queries');
 
 const {
@@ -35,6 +36,32 @@ exports.getRecentLogement = async (req, res) => {
             logements.push(l[0]);
         }
     }
+    res.status(200).json(logements);
+}
+
+exports.getByFiltres = async (req, res) => {
+    if(req.query.ville === 'undefined'){
+        req.query.ville = null
+    }
+    if(req.query.voyageurs === 'undefined'){
+        req.query.voyageurs = null
+    }
+    if(req.query.lits === 'undefined'){
+        req.query.lits = null
+    }
+    if(req.query.sdbs === 'undefined'){
+        req.query.sdbs = null
+    }
+    if(req.query.prix === 'undefined'){
+        req.query.prix = null
+    }
+    const logements = await getLogementsByFiltres(
+        req.query.ville, 
+        req.query.voyageurs, 
+        req.query.lits, 
+        req.query.sdbs, 
+        req.query.prix,
+        req.query.equipements);
     res.status(200).json(logements);
 }
 
