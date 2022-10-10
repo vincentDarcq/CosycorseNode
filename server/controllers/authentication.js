@@ -6,7 +6,11 @@ const User = require('../models/user.model');
 const RSA_PUBLIC_KEY = fs.readFileSync('./rsa/key.pub');
 const RSA_KEY_PRIVATE = fs.readFileSync('./rsa/key');
 
-const { getUserByName, getUsers, editUserPass } = require('../queries/user.queries');
+const { 
+  getUserByName, 
+  getUsers, 
+  getUserByMail
+} = require('../queries/user.queries');
 
 exports.refresh_token = async (req, res) => {
   const token = req.headers.authorization;
@@ -31,7 +35,7 @@ exports.isLoggedIn = async (req, res, next) => {
       if (err) { res.status(401).json('token invalid'); }
       const sub = decoded.sub;
       User.findOne({ '_id': sub }).exec((err, user) => {
-        if (err || !user) { res.status(401).json('error') }
+        if (err || !user) { res.status(500).json('error') }
         user.password = null;
         res.status(200).json(user);
       })
@@ -86,4 +90,37 @@ exports.signup = async (req, res) => {
       res.status(200).json(newUser)
     })
   }
+}
+
+exports.generateTokenForResetPwd = async (req, res, next) => {
+  const mail = req.query.mail;
+  try {
+    getUserByMail(req.query.mail).exec((err, user) => {
+      if (err) { res.status(500).json(err) }
+      if(user){
+        const token = jwt.sign({}, RSA_KEY_PRIVATE, {
+          algorithm: 'RS256',
+          subject: mail,
+          expiresIn: '10m'
+        })
+        res.locals.token = token;
+        return next();
+      }else {
+        res.status(404).json("Adresse email inconnue")
+      }
+    })
+  } catch (e) {
+    next(e);
+  }
+}
+
+exports.authentWithToken = async (req, res, next) => {
+  jwt.verify(req.query.token, RSA_PUBLIC_KEY, (err, decoded) => {
+    if (err) { res.status(401).json('token invalid'); }
+    const email = decoded.sub;
+    getUserByMail(email).exec((err, user) => {
+      if (err || !user) { res.status(500).json('error') }
+      res.status(200).json(user);
+    })
+  })
 }

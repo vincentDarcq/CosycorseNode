@@ -5,5 +5,6 @@ module.exports = {
   cert: path.join(__dirname, '../ssl/cert.pem'),
   key: path.join(__dirname, '../ssl/key.pem'),
   portHttp: 300,
-  portHttps: 443
+  portHttps: 443,
+  apiUrl: "https://localhost"
 }

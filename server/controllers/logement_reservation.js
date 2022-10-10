@@ -14,7 +14,7 @@ const {
 exports.create = async (req, res, next) => {
     const logementReservation = newLogementReservation(req);
     const lr = await createLogementReservation(logementReservation);
-    next();
+    return next();
 }
 
 exports.getReservations = async (req, res, next) => {

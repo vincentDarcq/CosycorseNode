@@ -4,8 +4,12 @@ const {
     forgotPassword
  } = require('../controllers/emails');
 
+ const { 
+    generateTokenForResetPwd
+ } = require('../controllers/authentication');
 
-router.get('/forgotPass', forgotPassword);
+
+router.get('/forgotPass', generateTokenForResetPwd, forgotPassword);
 router.post('/contactHost', contactHost);
 
 module.exports = router;

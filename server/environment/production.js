@@ -3,5 +3,6 @@ module.exports = {
   cert: '/etc/letsencrypt/live/eventmap.fr/fullchain.pem',
   key: '/etc/letsencrypt/live/eventmap.fr/privkey.pem',
   portHttp: 80,
-  portHttps: 443
+  portHttps: 443,
+  apiUrl: "https://cosycorse.fr"
 }

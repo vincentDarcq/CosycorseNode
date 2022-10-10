@@ -4,6 +4,7 @@ const {
   password
 } = require('../rsa/nodemailerpass');
 const { getUserByName } = require('../queries/user.queries');
+const env = require(`../environment/${process.env.NODE_ENV}`);
 
 let transporter = nodeMailer.createTransport({
   host: 'smtp.gmail.com',
@@ -52,7 +53,7 @@ exports.sendMailForBooking = async (req, res, next) => {
     <br><br>dates : ${req.body.dateDebut} - ${req.body.dateFin}<br>
     <p>${req.body.message}</p
     <b>Vous pouvez contacter le demandeur à l'adresse : ${req.body.emailDemandeur}</b><br>
-    <button style="background-color: green; border: solid 1px green; margin: auto; color: black;" href="#">Accepter/Refuser</button>`
+    <a style="border: solid 1px green; margin: auto; color: white;" href="${env.apiUrl}">Accepter/Refuser</a>`
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
@@ -70,8 +71,9 @@ exports.forgotPassword = async (req, res, next) => {
     subject: "Mot de passe oublié", // Subject line
     text: req.body.message, // plain text body
     html: 
-    `<b>Vous pouvez changer votre mot de passe en cliquant sur le bouton suivant :</b>
-    <button style="background-color: green; border: solid 1px green; margin: auto; color: black;" href="#">Changer mon mot de passe</button>`
+    `<b>Vous pouvez changer votre mot de passe en cliquant sur le lien suivant :</b>
+    <a style="border: solid 1px green; margin: auto; color: white;" href="${env.apiUrl}/reset_password/${res.locals.token}">Changer mon mot de passe</a><\t>
+    <b>Attentetion, ce lien n'est valable que 15 minutes</b>`
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {

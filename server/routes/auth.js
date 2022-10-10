@@ -4,12 +4,14 @@ const {
   signin,
   refresh_token,
   signup,
-  isLoggedIn
+  isLoggedIn,
+  authentWithToken
 } = require('../controllers/authentication')
 
 router.get('/refresh-token', refresh_token);
 router.get('/current', isLoggedIn);
 router.post('/signin', signin);
 router.post('/signup', signup);
+router.get('/authent-withToken', authentWithToken);
 
 module.exports = router;
