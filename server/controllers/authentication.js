@@ -116,11 +116,13 @@ exports.generateTokenForResetPwd = async (req, res, next) => {
 
 exports.authentWithToken = async (req, res, next) => {
   jwt.verify(req.query.token, RSA_PUBLIC_KEY, (err, decoded) => {
-    if (err) { res.status(401).json('token invalid'); }
-    const email = decoded.sub;
-    getUserByMail(email).exec((err, user) => {
-      if (err || !user) { res.status(500).json('error') }
-      res.status(200).json(user);
-    })
-  })
+    if (err) { res.status(401).json('Ce lien a expiré'); }
+    if(decoded){
+      console.log("good token")
+      const email = decoded.sub;
+      getUserByMail(email).exec((err, user) => {
+        if (err || !user) { res.status(500).json('error') }
+        res.status(200).json(user);
+      })
+    }})
 }

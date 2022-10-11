@@ -8,6 +8,7 @@ const logementReservationSchema = Schema({
     prix: Number,
     message: String,
     annonceur: String,
+    accepte: Boolean,
     logementId: { type: Schema.Types.ObjectId, ref: "logement" },
 });
 
@@ -34,8 +35,11 @@ module.exports.editLogementReservation = function (req) {
     const editLogement = {
         dateDebut: req.body.dateDebut,
         dateFin: req.body.dateFin,
+        message: req.body.message,
+        prix: req.body.prix,
         emailDemandeur: req.body.emailDemandeur,
         annonceur: req.body.annonceur,
+        accepte: req.body.accepte,
         logementId: req.body.logementId
     };
     return editLogement;

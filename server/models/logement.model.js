@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const logementSchema = Schema({
-    addresse: String,
+    adresse: String,
     ville: String,
     description: String,
     logement: String,
@@ -28,7 +28,7 @@ module.exports = Logement;
 
 module.exports.newLogement = function (req) {
     const newLogement = new Logement({
-        addresse: req.body.addresse,
+        adresse: req.body.addresse,
         ville: req.body.ville,
         description: req.body.description,
         logement: req.body.logement,
@@ -50,7 +50,7 @@ module.exports.newLogement = function (req) {
 
 module.exports.editLogement = function (req) {
     const editLogement = {
-        addresse: req.body.addresse,
+        adresse: req.body.addresse,
         ville: req.body.ville,
         description: req.body.description,
         logement: req.body.logement,
