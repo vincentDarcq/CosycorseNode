@@ -13,6 +13,10 @@ exports.getReservationsBylogementId = (logementId) => {
   return LogementReservation.find({ logementId : ObjectId(logementId) }).exec();
 }
 
+exports.getReservationsByEmailDemandeur = (userEmail) => {
+  return LogementReservation.find({ emailDemandeur : userEmail }).exec();
+}
+
 exports.getLogementReservationById = (logementReservationId) => {
   return LogementReservation.findById(logementReservationId).exec();
 }

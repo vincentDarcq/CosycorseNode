@@ -2,7 +2,8 @@ const {
     saveLogementReservation,
     getReservationsBylogementId,
     getLogementReservationById,
-    updateLogementReservation
+    updateLogementReservation,
+    getReservationsByEmailDemandeur
 } = require('../queries/logement_reservation.queries');
 
 const {
@@ -20,8 +21,13 @@ exports.create = async (req, res, next) => {
     return next();
 }
 
-exports.getReservations = async (req, res, next) => {
+exports.getReservationsByLogementId = async (req, res, next) => {
     const logementReservations = await getReservationsBylogementId(req.query.logementId);
+    res.status(200).json(logementReservations);
+}
+
+exports.getReservationsByEmailDemandeur = async (req, res, next) => {
+    const logementReservations = await getReservationsByEmailDemandeur(req.query.userEmail);
     res.status(200).json(logementReservations);
 }
 

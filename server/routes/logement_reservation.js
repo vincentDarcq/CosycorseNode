@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const {
     create,
-    getReservations,
+    getReservationsByLogementId,
     accepteReservation,
-    rejectReservation
+    rejectReservation,
+    getReservationsByEmailDemandeur
 } = require('../controllers/logement_reservation');
 const { 
     sendMailForBooking,
@@ -11,7 +12,8 @@ const {
  } = require('../controllers/emails');
 
 router.post('/create', create, sendMailForBooking);
-router.get('/getReservations', getReservations);
+router.get('/getReservationsByLogementId', getReservationsByLogementId);
+router.get('/getReservationsByDemandeurEmail', getReservationsByEmailDemandeur);
 router.get('/accepteReservation', accepteReservation, sendConfirmationForLogementReservation);
 router.get('/rejectReservation', rejectReservation);
 
