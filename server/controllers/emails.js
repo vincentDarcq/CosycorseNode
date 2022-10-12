@@ -80,13 +80,12 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.sendConfirmationForLogementReservation = async (req, res, next) => {
-  const user = await getUserByMail(res.locals.lr.emailDemandeur);
   const html = `<b>Votre demande de réservation pour la Corse a été acceptée ! <br>
                 <p>${res.locals.logement.ville}</p><br>
                 <p>${res.locals.logement.adresse}</p><br>
                 <a style="border: solid 1px green; padding: 5px; background-color: green; color: white; text-decoration :none;" href="${env.apiUrl}/logement/${res.locals.logement._id}">Voir l'annonce</a><br><br>
                 <b>Vous pouvez annuler 48h à l'avance en allant sur votre compte</b>
-                <a style="border: solid 1px green; padding: 5px; background-color: green; color: white; text-decoration :none;" href="${env.apiUrl}/mon_compte/${user._id}">Mon compte</a>`
+                <a style="border: solid 1px green; padding: 5px; background-color: green; color: white; text-decoration :none;" href="${env.apiUrl}/mon_compte">Mon compte</a>`
   let options = mailOptions(res.locals.lr.emailDemandeur, "Vous partez pour la Corse !", "Demande acceptée !", html);
   transporter.sendMail(options, (error, info) => {
     if (error) {
