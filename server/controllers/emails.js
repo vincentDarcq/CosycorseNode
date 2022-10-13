@@ -6,7 +6,7 @@ const {
 const { getUserByName, getUserByMail } = require('../queries/user.queries');
 const env = require(`../environment/${process.env.NODE_ENV}`);
 
-let transporter = nodeMailer.createTransport({
+const transporter = nodeMailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
   secure: true,

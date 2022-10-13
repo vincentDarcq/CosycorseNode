@@ -58,6 +58,7 @@ exports.accepteReservation = async (req, res, next) => {
 }
 
 exports.rejectReservation = async (req, res, next) => {
-    deleteLogementReservationById(req.query.logementReservationId);
+    res.locals.lr = await deleteLogementReservationById(req.query.logementReservationId);
+    res.locals.logement = await getLogementById(res.locals.lr.logementId);
     next();
 }
