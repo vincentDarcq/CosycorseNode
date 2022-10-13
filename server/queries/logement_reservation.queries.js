@@ -20,4 +20,8 @@ exports.getReservationsByEmailDemandeur = (userEmail) => {
 exports.getLogementReservationById = (logementReservationId) => {
   return LogementReservation.findById(logementReservationId).exec();
 }
+
+exports.deleteLogementReservationById = (logementReservationId) => {
+  return LogementReservation.findByIdAndDelete(logementReservationId).exec();
+}
   

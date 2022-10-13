@@ -28,7 +28,7 @@ module.exports = Logement;
 
 module.exports.newLogement = function (req) {
     const newLogement = new Logement({
-        adresse: req.body.addresse,
+        adresse: req.body.adresse,
         ville: req.body.ville,
         description: req.body.description,
         logement: req.body.logement,
