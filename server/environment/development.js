@@ -1,5 +1,5 @@
 const path = require('path');
-const { mongoPass } = require('../tokens/development')
+const { mongoPass } = require('../tokens/development');
 
 module.exports = {
   dbUrl: `mongodb+srv://vincent:${mongoPass}@cluster0.ic0uz.mongodb.net/EventMap?retryWrites=true&w=majority`,
