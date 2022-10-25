@@ -3,7 +3,9 @@ const util = require('util');
 const {
     createLieu,
     getLieuById,
-    findByIdAndUpdate
+    findByIdAndUpdate,
+    getAllLieux,
+    getLieuxByFilters
 } = require('../queries/lieu.queries');
 const {
     newLieu,
@@ -20,6 +22,22 @@ exports.updateLieu = async (req, res) => {
     const lieu = editLieu(req, res);
     const lieuUpdated = await findByIdAndUpdate(req.query.lieuId, lieu);
     res.status(200).json(lieuUpdated);
+}
+
+exports.getAll = async (req, res) => {
+    const lieux = await getAllLieux();
+    res.status(200).json(lieux);
+}
+
+exports.findByFilters = async (req, res) => {
+    req.query.nom = req.query.nom === 'undefined' ? null : req.query.nom;
+    req.query.ville = req.query.ville === 'undefined' ? null : req.query.ville;
+    req.query.type = req.query.type === 'undefined' ? null : req.query.type;
+    const lieux = await getLieuxByFilters(
+        req.query.nom, 
+        req.query.ville, 
+        req.query.type);
+    res.status(200).json(lieux);
 }
 
 exports.uploadImages = async (req, res) => {

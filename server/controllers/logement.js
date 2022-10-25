@@ -40,21 +40,11 @@ exports.getRecentLogement = async (req, res) => {
 }
 
 exports.getByFiltres = async (req, res) => {
-    if(req.query.ville === 'undefined'){
-        req.query.ville = null
-    }
-    if(req.query.voyageurs === 'undefined'){
-        req.query.voyageurs = null
-    }
-    if(req.query.lits === 'undefined'){
-        req.query.lits = null
-    }
-    if(req.query.sdbs === 'undefined'){
-        req.query.sdbs = null
-    }
-    if(req.query.prix === 'undefined'){
-        req.query.prix = null
-    }
+    req.query.ville = req.query.ville === 'undefined' ? null : req.query.ville;
+    req.query.voyageurs = req.query.voyageurs === 'undefined' ? null : req.query.voyageurs;
+    req.query.lits = req.query.lits === 'undefined' ? null : req.query.lits;
+    req.query.sdbs = req.query.sdbs === 'undefined' ? null : req.query.sdbs;
+    req.query.prix = req.query.prix === 'undefined' ? null : req.query.prix;
     const logements = await getLogementsByFiltres(
         req.query.ville, 
         req.query.voyageurs, 

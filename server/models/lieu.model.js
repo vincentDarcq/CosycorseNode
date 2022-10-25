@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const lieuSchema = Schema({
+    nom: String,
     ville: String,
     type: String,
     description: String,
@@ -19,6 +20,7 @@ module.exports = Lieu;
 
 module.exports.newLieu = function (req) {
     const newLieu = new Lieu({
+        nom: req.body.nom,
         ville: req.body.ville,
         type: req.body.type,
         description: req.body.description,
@@ -32,6 +34,7 @@ module.exports.newLieu = function (req) {
 
 module.exports.editLieu = function (req) {
     const editLieu = {
+        nom: req.body.nom,
         ville: req.body.ville,
         type: req.body.type,
         description: req.body.description,

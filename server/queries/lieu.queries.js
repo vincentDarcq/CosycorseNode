@@ -4,7 +4,7 @@ exports.createLieu = (lieu, res) => {
     return lieu.save();
 }
 
-exports.getAllLieu = () => {
+exports.getAllLieux = () => {
     return Lieu.find({}).exec();
 }
 
@@ -14,4 +14,12 @@ exports.getLieuById = (lieuId) => {
 
 exports.findByIdAndUpdate = (id, lieu) => {
     return Lieu.findByIdAndUpdate({ _id: id }, lieu, {new: true})
+}
+
+exports.getLieuxByFilters = (nom, ville, type) => {
+    return Lieu.find({
+        nom: nom ? nom : {$exists: true},
+        ville: ville ? ville : {$exists: true},
+        type: type ? type : {$exists: true}
+    });
 }
