@@ -4,6 +4,10 @@ exports.getUsers = () => {
   return User.find({}).exec();
 }
 
+exports.getUserById = (userId) => {
+  return User.findById(userId).exec();
+}
+
 exports.findUsersForNamesStartWith = (value) => {
   return User.find({ "name": { $regex: "^" + value } }).exec();
 }
@@ -12,8 +16,8 @@ exports.getUserByMail = (email) => {
   return User.findOne({ 'email': email });
 }
 
-exports.getUserByName = (name) => {
-  return User.findOne({ 'name': name });
+exports.getUserByLastName = (name) => {
+  return User.findOne({ 'lastName': name });
 }
 
 exports.findByIdAndUpdate = (id, user) => {

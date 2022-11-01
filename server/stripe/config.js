@@ -1,5 +1,8 @@
 const router = require('express').Router();
-const { STRIPE_SECRET_KEY } = require(`../tokens/${process.env.NODE_ENV}`)
+const { 
+    STRIPE_SECRET_KEY,
+    STRIPE_PUBLISHABLE_KEY
+} = require(`../tokens/${process.env.NODE_ENV}`)
 
 exports.stripe = require('stripe')(STRIPE_SECRET_KEY, {
     apiVersion: '2020-08-27',
@@ -12,7 +15,7 @@ exports.stripe = require('stripe')(STRIPE_SECRET_KEY, {
 
 router.get('/config', (req, res) => {
     res.send({
-        publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+        publishableKey: STRIPE_PUBLISHABLE_KEY,
     });
 });
 

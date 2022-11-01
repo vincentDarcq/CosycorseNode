@@ -7,9 +7,9 @@ const RSA_PUBLIC_KEY = fs.readFileSync('./rsa/key.pub');
 const RSA_KEY_PRIVATE = fs.readFileSync('./rsa/key');
 
 const { 
-  getUserByName, 
   getUsers, 
-  getUserByMail
+  getUserByMail,
+  getUserById
 } = require('../queries/user.queries');
 
 exports.refresh_token = async (req, res) => {
@@ -26,6 +26,16 @@ exports.refresh_token = async (req, res) => {
   } else {
     res.json('no token to refresh');
   }
+}
+
+exports.getUserFromToken = async (req, res, next) => {
+  const token = req.headers.authorization;
+  jwt.verify(token, RSA_PUBLIC_KEY, async (err, decoded) => {
+    if (err) { res.status(401).json('token invalid'); }
+    const sub = decoded.sub;
+    res.locals.user = await getUserById(sub);
+    next();
+  })
 }
 
 exports.isLoggedIn = async (req, res, next) => {
@@ -47,7 +57,7 @@ exports.isLoggedIn = async (req, res, next) => {
 
 exports.signin = async (req, res, next) => {
   try {
-    getUserByName(req.body.name).exec((err, user) => {
+    getUserByMail(req.body.email).exec((err, user) => {
       if (err) { res.status(500).json(err) }
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         const token = jwt.sign({}, RSA_KEY_PRIVATE, {
@@ -67,7 +77,8 @@ exports.signin = async (req, res, next) => {
 exports.signup = async (req, res) => {
   const newUser = new User({
     email: req.body.email,
-    name: req.body.name,
+    firstName: req.body.prenom,
+    lastName: req.body.nom,
     password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(8)),
     profile_type: req.body.profile_type
   })
@@ -75,9 +86,7 @@ exports.signup = async (req, res) => {
   let errUser = "";
   const users = await getUsers();
   users.forEach((user) => {
-    if (user.name === newUser.name) {
-      errUser = "Ce nom existe déjà";
-    } else if (user.email === newUser.email) {
+    if (user.email === newUser.email) {
       errUser = "Cet email est déjà enregistré";
     }
   })
@@ -101,7 +110,7 @@ exports.generateTokenForResetPwd = async (req, res, next) => {
         const token = jwt.sign({}, RSA_KEY_PRIVATE, {
           algorithm: 'RS256',
           subject: mail,
-          expiresIn: '10m'
+          expiresIn: '15m'
         })
         res.locals.token = token;
         return next();

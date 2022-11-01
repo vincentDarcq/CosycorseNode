@@ -24,7 +24,7 @@ exports.create = async (req, res) => {
 }
 
 exports.getByAnnonceur = async (req, res) => {
-    const logements = await getLogementByAnnonceur(req.query.annonceur);
+    const logements = await getLogementByAnnonceur(req.query.emailAnnonceur);
     res.status(200).json(logements);
 }
 
@@ -176,7 +176,7 @@ exports.uploadImages = async (req, res) => {
     res.status(200).json(updatedLogement);
 }
 
-deleteImage = (imageToRemove) => {
+let deleteImage = (imageToRemove) => {
     fs.unlink(path.join(__dirname, `../upload/${imageToRemove}`), err => {
         if (err) throw err;
     });

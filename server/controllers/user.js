@@ -2,7 +2,7 @@ const util = require('util');
 const fs = require('fs');
 const {
   getUserByMail,
-  getUserByName,
+  getUserByLastName,
   editUserPass,
   findByIdAndUpdate,
   deleteUserByMail
@@ -13,7 +13,7 @@ const bcrypt = require('bcryptjs');
 exports.uploadPicture = async (req, res, next) => {
   util.inspect(req.files, { compact: false, depth: 5, breakLength: 80, color: true });
   try {
-    const user = await getUserByName(req.query.user);
+    const user = await getUserByLastName(req.query.user);
     user.picture = req.files.picture[0].filename;
     const updatedUser = await findByIdAndUpdate(user._id, user);
     res.status(200).json(updatedUser);

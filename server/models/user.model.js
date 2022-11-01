@@ -3,8 +3,10 @@ const Schema = mongoose.Schema;
 
 const userSchema = Schema({
     email: String,
-    name: String,
-    password: String
+    firstName: String,
+    lastName: String,
+    password: String,
+    stripeUserId: String
 });
 
 userSchema.set('timestamps', true);
