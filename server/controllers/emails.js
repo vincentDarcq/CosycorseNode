@@ -4,6 +4,7 @@ const {
   password
 } = require('../rsa/nodemailerpass');
 const { getUserByMail } = require('../queries/user.queries');
+const { getLogementByEmailAnnonceur } = require('../queries/logement.queries');
 const env = require(`../environment/${process.env.NODE_ENV}`);
 
 const transporter = nodeMailer.createTransport({
@@ -67,6 +68,7 @@ exports.sendMailForBooking = async (req, res, next) => {
                 <a style="border: solid 1px green; padding: 5px; margin: 5px; background-color: green; color: white; text-decoration :none;" href="${env.apiUrl}/reponseLogementReservation/${res.locals.lr._id}">Accepter/Refuser</a>
                 </div>`
   let options = mailOptions(req.body.emailAnnonceur, "Demande de réservation", req.body.message, html);
+  console.log(req.body)
   transporter.sendMail(options, (error, info) => {
     if (error) {
       return res.status(500).json(error);;
@@ -104,5 +106,23 @@ exports.sendRejectionForLogementReservation = async (req, res, next) => {
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
     res.status(200).json("Un mail de refus a été envoyé au voyageur");
+  });
+}
+
+exports.sendCancelationForLogementReservation = async (req, res, next) => {
+  const customer = await getUserByMail(req.body.monCompteReservation.logementReservation.emailDemandeur);
+  const html = req.body.message.length > 0 ? 
+                `<b>Nous sommes désolé d'apporter une mauvaise nouvelle :<br>
+                ${ customer.firstName } ${ customer.lastName} vient d'annuler sa réservation pour votre logement situé au ${req.body.monCompteReservation.logement.adresse}<br>
+                Il vous a laissé un message : <br> ${req.body.message}` : 
+                `<b>Nous sommes désolé d'apporter une mauvaise nouvelle :<br>
+                ${ customer.firstName } ${ customer.lastName} vient d'annuler sa réservation pour votre logement situé au ${req.body.monCompteReservation.logement.adresse}<br>`;
+  let options = mailOptions(req.body.monCompteReservation.logementReservation.emailAnnonceur, "Reservation annulée", "Reservation annulée", html);
+  transporter.sendMail(options, (error, info) => {
+    if (error) {
+      return res.status(500).json(error);
+    }
+    console.log('Message %s sent: %s', info.messageId, info.response);
+    res.status(200).json("Un mail d'annulation vient d'être envoyé à l'hôte");
   });
 }

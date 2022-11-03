@@ -11,7 +11,7 @@ const logementSchema = Schema({
     sdbs: Number,
     latitude: Number,
     longitude: Number,
-    annonceur: String,
+    emailAnnonceur: String,
     prix: Number,
     equipements: [String],
     images: [String],

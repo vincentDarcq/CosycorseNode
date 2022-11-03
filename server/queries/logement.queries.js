@@ -8,8 +8,8 @@ exports.getAllLogement = () => {
   return Logement.find({}).exec();
 }
 
-exports.getLogementByAnnonceur = (annonceur) => {
-  return Logement.find({ annonceur: annonceur}).exec();
+exports.getLogementByEmailAnnonceur = (emailAnnonceur) => {
+  return Logement.find({ emailAnnonceur: emailAnnonceur}).exec();
 }
 
 exports.getLogementsByVilleRecentToOld = (ville) => {
