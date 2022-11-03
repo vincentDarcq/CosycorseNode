@@ -9,6 +9,7 @@ const logementReservationSchema = Schema({
     message: String,
     annonceur: String,
     accepte: Boolean,
+    paymentMethodId: String,
     logementId: { type: Schema.Types.ObjectId, ref: "logement" },
 });
 
@@ -26,7 +27,8 @@ module.exports.newLogementReservation = function (req) {
         prix: req.body.prix,
         emailDemandeur: req.body.emailDemandeur,
         annonceur: req.body.annonceur,
-        logementId: req.body.logementId
+        logementId: req.body.logementId,
+        paymentMethodId: req.body.paymentMethodId
     });
     return newLogement;
 }

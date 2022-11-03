@@ -3,7 +3,7 @@ const {
   user,
   password
 } = require('../rsa/nodemailerpass');
-const { getUserByName, getUserByMail } = require('../queries/user.queries');
+const { getUserByMail } = require('../queries/user.queries');
 const env = require(`../environment/${process.env.NODE_ENV}`);
 
 const transporter = nodeMailer.createTransport({
@@ -30,11 +30,10 @@ let mailOptions = (to, subject, text, html) => {
 }
 
 exports.contactHost = async (req, res, next) => {
-  const annonceur = await getUserByName(req.body.to);
   const html =  `<b>Vous avez un message :</b>
                 <br><br>${req.body.message}<br>
                 <b>Répondre à : ${req.body.from}</b>`
-  let options = mailOptions(annonceur.email, req.body.subject, req.body.message, html);
+  let options = mailOptions(req.body.to, req.body.subject, req.body.message, html);
 
   transporter.sendMail(options, (error, info) => {
     if (error) {
@@ -60,7 +59,6 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.sendMailForBooking = async (req, res, next) => {
-  const annonceur = await getUserByName(req.body.annonceur);
   const html = `<b>Vous avez une demande de réservation :</b>
                 <br><br>dates : ${req.body.dateDebut} - ${req.body.dateFin}<br>
                 <p>${req.body.message}</p
@@ -68,7 +66,7 @@ exports.sendMailForBooking = async (req, res, next) => {
                 <div style="display: flex; flex-direction: row; margin: 5% 35%;">
                 <a style="border: solid 1px green; padding: 5px; margin: 5px; background-color: green; color: white; text-decoration :none;" href="${env.apiUrl}/reponseLogementReservation/${res.locals.lr._id}">Accepter/Refuser</a>
                 </div>`
-  let options = mailOptions(annonceur.email, "Demande de réservation", req.body.message, html);
+  let options = mailOptions(req.body.emailAnnonceur, "Demande de réservation", req.body.message, html);
   transporter.sendMail(options, (error, info) => {
     if (error) {
       return res.status(500).json(error);;

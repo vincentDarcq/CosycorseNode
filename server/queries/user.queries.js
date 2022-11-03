@@ -16,6 +16,10 @@ exports.getUserByMail = (email) => {
   return User.findOne({ 'email': email });
 }
 
+exports.getUserByName = (name) => {
+  return User.findOne({ 'lastName': name });
+}
+
 exports.getUserByLastName = (name) => {
   return User.findOne({ 'lastName': name });
 }

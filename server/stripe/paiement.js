@@ -12,13 +12,20 @@ const {
 
 const { 
   STRIPE_SECRET_KEY, 
-  STRIPE_CLIENT_ID 
+  STRIPE_CLIENT_ID,
+  STRIPE_WEBHOOK_SECRET
 } = require(`../tokens/${process.env.NODE_ENV}`);
+
+const stripe = require('stripe')(STRIPE_SECRET_KEY);
 
 const {
   getUserById,
   findByIdAndUpdate
 } = require(`../queries/user.queries`);
+
+const {
+  getLogementById
+} = require(`../queries/logement.queries`);
 
 let makeStripeConnectRequest = async (code) => {
   let params = {
@@ -98,77 +105,76 @@ router.get('/response/setup', getUserFromToken, async (req, res) => {
   }
 })
 
-router.post('/create-payment-intent', async (req, res) => {
-    const {paymentMethodType, currency,paymentMethodOptions} = req.body;
-  
-    // Each payment method type has support for different currencies. In order to
-    // support many payment method types and several currencies, this server
-    // endpoint accepts both the payment method type and the currency as
-    // parameters.
-    //
-    // Some example payment method types include `card`, `ideal`, and `alipay`.
-    const params = {
-      payment_method_types: ['card'],
-      amount: 5999,
-      currency: 'eur',
-    }
-  
-    // If this is for an ACSS payment, we add payment_method_options to create
-    // the Mandate.
-    if(paymentMethodType === 'acss_debit') {
-      params.payment_method_options = {
-        acss_debit: {
-          mandate_options: {
-            payment_schedule: 'sporadic',
-            transaction_type: 'personal',
-          },
-        },
-      }
-    } else if (paymentMethodType === 'konbini') {
-      /**
-       * Default value of the payment_method_options
-       */
-      params.payment_method_options = {
-        konbini: {
-          product_description: 'Tシャツ',
-          expires_after_days: 3,
-        },
-      }
-    } else if (paymentMethodType === 'customer_balance') {
-      params.payment_method_data = {
-        type: 'customer_balance',
-      }
-      params.confirm = true
-      params.customer = req.body.customerId || await stripe.customers.create().then(data => data.id)
-    }
-  
-    /**
-     * If API given this data, we can overwride it
-     */
-    if (paymentMethodOptions) {
-      params.payment_method_options = paymentMethodOptions
-    }
-  
-    // Create a PaymentIntent with the amount, currency, and a payment method type.
-    //
-    // See the documentation [0] for the full list of supported parameters.
-    //
-    // [0] https://stripe.com/docs/api/payment_intents/create
+router.get('/create-payment-intent', async (req, res) => {
+  const logementId = req.query.logementId;
+  const nuits = req.query.nuits;
+  const paymentMethodId = req.query.paymentMethodId;
+
+  const logement = await getLogementById(logementId);
+  const amount = nuits * (logement.prix + logement.prix * 10/100) * 100;
+
+  const params = {
+    payment_method: paymentMethodId,
+    payment_method_types: ['card'],
+    amount: amount,
+    currency: 'eur',
+    transfer_group: `adresse : ${logement.adresse}, customer : ${req.query.customerId}`
+  }
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create(params);
+
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+      nextAction: paymentIntent.next_action,
+    });
+  } catch (e) {
+    return res.status(400).send({
+      error: {
+        message: e.message,
+      },
+    });
+  }
+});
+
+router.post('/webhook', async (req, res) => {
+  console.log("webhook")
+  let data, eventType;
+
+  // Check if webhook signing is configured.
+  if (STRIPE_WEBHOOK_SECRET) {
+    // Retrieve the event by verifying the signature using the raw body and secret.
+    let event;
+    let signature = req.headers['stripe-signature'];
     try {
-      const paymentIntent = await stripe.paymentIntents.create(params);
-  
-      // Send publishable key and PaymentIntent details to client
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-        nextAction: paymentIntent.next_action,
-      });
-    } catch (e) {
-      return res.status(400).send({
-        error: {
-          message: e.message,
-        },
-      });
+      event = stripe.webhooks.constructEvent(
+        req.rawBody,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.log(`⚠️  Webhook signature verification failed.`);
+      return res.sendStatus(400);
     }
-  });
+    data = event.data;
+    eventType = event.type;
+    console.log(eventType);
+  } else {
+    // Webhook signing is recommended, but if the secret is not configured in `config.js`,
+    // we can retrieve the event data directly from the request body.
+    data = req.body.data;
+    eventType = req.body.type;
+  }
+
+  if (eventType === 'payment_intent.succeeded') {
+    // Funds have been captured
+    // Fulfill any orders, e-mail receipts, etc
+    // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds)
+    console.log('💰 Payment captured!');
+  } else if (eventType === 'payment_intent.payment_failed') {
+    console.log('❌ Payment failed.');
+  }
+  res.sendStatus(200);
+});
 
 module.exports = router;
