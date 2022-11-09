@@ -16,16 +16,12 @@ exports.getUserByMail = (email) => {
   return User.findOne({ 'email': email });
 }
 
-exports.getUserByName = (name) => {
-  return User.findOne({ 'lastName': name });
-}
-
 exports.getUserByLastName = (name) => {
   return User.findOne({ 'lastName': name });
 }
 
 exports.findByIdAndUpdate = (id, user) => {
-  return User.findByIdAndUpdate({ _id: id }, user)
+  return User.findByIdAndUpdate({ _id: id }, user, {new: true})
 }
 
 exports.deleteUserByMail = (userEmail) => {

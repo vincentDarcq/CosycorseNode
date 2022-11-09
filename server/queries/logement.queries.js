@@ -1,6 +1,6 @@
 const Logement = require('../models/logement.model');
 
-exports.createLogement = (logement, res) => {
+exports.createLogement = (logement) => {
   return logement.save();
 }
 

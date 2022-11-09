@@ -8,8 +8,9 @@ const logementReservationSchema = Schema({
     prix: Number,
     message: String,
     emailAnnonceur: String,
-    accepte: Boolean,
-    paymentMethodId: String,
+    status: String,
+    pm: String,
+    pi: String,
     logementId: { type: Schema.Types.ObjectId, ref: "logement" },
 });
 
@@ -20,7 +21,6 @@ const LogementReservation = mongoose.model('logement_reservation', logementReser
 module.exports = LogementReservation;
 
 module.exports.newLogementReservation = function (req) {
-    console.log(req.body)
     const newLogement = new LogementReservation({
         dateDebut: req.body.dateDebut,
         dateFin: req.body.dateFin,
@@ -29,7 +29,8 @@ module.exports.newLogementReservation = function (req) {
         emailDemandeur: req.body.emailDemandeur,
         emailAnnonceur: req.body.emailAnnonceur,
         logementId: req.body.logementId,
-        paymentMethodId: req.body.paymentMethodId
+        pm: req.body.pm,
+        pi: req.body.pi,
     });
     return newLogement;
 }

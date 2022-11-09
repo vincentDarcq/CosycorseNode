@@ -24,7 +24,7 @@ exports.uploadPicture = async (req, res, next) => {
 
 exports.deletePicture = async (req, res, next) => {
   try {
-    const user = await getUserByName(req.query.user);
+    const user = await getUserByLastName(req.query.user);
     if (user.picture) {
       fs.unlink(path.join(__dirname, `../upload/${user.picture}`), err => {
         if (err) throw err;
@@ -38,7 +38,7 @@ exports.deletePicture = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
   try {
-    const user = await getUserByName(req.query.user);
+    const user = await getUserByLastName(req.query.user);
     res.status(200).json(user)
   } catch (e) {
     next(e);

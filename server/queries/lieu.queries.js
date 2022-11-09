@@ -1,6 +1,6 @@
 const Lieu = require('../models/lieu.model');
 
-exports.createLieu = (lieu, res) => {
+exports.createLieu = (lieu) => {
     return lieu.save();
 }
 

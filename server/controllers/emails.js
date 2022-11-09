@@ -68,7 +68,6 @@ exports.sendMailForBooking = async (req, res, next) => {
                 <a style="border: solid 1px green; padding: 5px; margin: 5px; background-color: green; color: white; text-decoration :none;" href="${env.apiUrl}/reponseLogementReservation/${res.locals.lr._id}">Accepter/Refuser</a>
                 </div>`
   let options = mailOptions(req.body.emailAnnonceur, "Demande de réservation", req.body.message, html);
-  console.log(req.body)
   transporter.sendMail(options, (error, info) => {
     if (error) {
       return res.status(500).json(error);;
