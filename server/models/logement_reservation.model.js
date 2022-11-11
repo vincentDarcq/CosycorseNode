@@ -31,6 +31,7 @@ module.exports.newLogementReservation = function (req) {
         logementId: req.body.logementId,
         pm: req.body.pm,
         pi: req.body.pi,
+        status: "attente"
     });
     return newLogement;
 }

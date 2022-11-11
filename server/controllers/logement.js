@@ -18,9 +18,14 @@ const {
 } = require('../models/logement.model');
 
 exports.create = async (req, res) => {
-    const logement = newLogement(req, res);
-    const l = await createLogement(logement);
-    res.status(200).json(l);
+    if((req.body.longitude < 7.975044250488282 || req.body.longitude > 9.644966125488283)
+      && (req.body.latitude < 41.35774173825274 || req.body.latitude > 43.06637963617605)){
+        res.status(400).json("Cette adresse n'est pas en Corse");
+    }else {
+        const logement = newLogement(req, res);
+        const l = await createLogement(logement);
+        res.status(200).json(l);
+    }
 }
 
 exports.getByAnnonceur = async (req, res) => {

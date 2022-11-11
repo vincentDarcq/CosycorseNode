@@ -4,7 +4,7 @@ const {
     getLogementReservationById,
     updateLogementReservation,
     getReservationsByEmailDemandeur,
-    deleteLogementReservationById
+    getReservationsByEmailAnnonceur
 } = require('../queries/logement_reservation.queries');
 
 const {
@@ -40,6 +40,11 @@ exports.getReservationsByEmailDemandeur = async (req, res, next) => {
     res.status(200).json(logementReservations);
 }
 
+exports.getReservationsByEmailAnnonceur = async (req, res, next) => {
+    const logementReservations = await getReservationsByEmailAnnonceur(req.query.userEmail);
+    res.status(200).json(logementReservations);
+}
+
 exports.getReservationByLogementReservationId = async (req, res, next) => {
     const logementReservation = await getLogementReservationById(req.query.logementReservationId);
     if(logementReservation){
@@ -65,7 +70,7 @@ exports.accepteReservation = async (req, res, next) => {
             res.status(404).json({});
         }
     }catch(e){
-        res.status(500).json("L'erreur suivante s'est produite: "+e);
+        res.status(500).json(e);
     }
 }
 
@@ -83,8 +88,15 @@ exports.rejectReservation = async (req, res, next) => {
 
 exports.cancelReservation = async (req, res, next) => {
     try {
-        const lr = req.body.monCompteReservation.logementReservation;
-        const logement = req.body.monCompteReservation.logement;
+        let lr;
+        let logement;
+        if(req.body.monCompteReservation){
+            lr = req.body.monCompteReservation.logementReservation;
+            logement = req.body.monCompteReservation.logement;
+        }else {
+            lr = req.body.monCompteVoyage.logementReservation;
+            logement = req.body.monCompteVoyage.logement;
+        }
         const formattedDate = lr.dateDebut.split('/')[1] + "/" + lr.dateDebut.split('/')[0] + "/" + lr.dateDebut.split('/')[2];
         let dateDebut = new Date(formattedDate);
         dateDebut.setHours(dateDebut.getHours() + 1);
@@ -92,21 +104,19 @@ exports.cancelReservation = async (req, res, next) => {
         now.setHours(now.getHours() + 1);
         const delais = dateDebut.getTime() - now.getTime();
         const jours = Math.floor((delais / 1000) / 3600) / 24;
+        let refund;
         if(jours >= 2){
-            const refund = await stripe.refunds.create({
-                payment_intent: lr.pi,
-                reason: 'requested_by_customer',
-                refund_application_fee: false,
-                metadata: {
-                    emailAnnonceurLogement: logement.emailAnnonceur,
-                    emailDemandeurLogement: lr.emailDemandeur,
-                    adresseLogement: logement.adresse,
-                    debutReservation: lr.dateDebut,
-                    finReservation: lr.dateFin,
-                    messageAnnulation: req.body.message
+            if(req.query.fromHost === "fromHost"){
+                if(req.body.message.length === 0){
+                    res.status(400).json("Votre message était vide, l'annulation n'a pas abouti");
+                }else {
+                    refund = await refundCustomer(logement, lr, 'host', req.body.message);
                 }
-            });
-            lr.status === "annulée";
+            }else {
+                refund = await refundCustomer(logement, lr, 'customer', req.body.message);
+            }
+            lr.status = "annulée";
+            console.log(lr);
             createRemboursement(newRemboursement(refund));
             updateLogementReservation(lr);
             next();
@@ -116,4 +126,21 @@ exports.cancelReservation = async (req, res, next) => {
     }catch(e){
         res.status(500).json("L'erreur suivante s'est produite: "+e);
     }
+}
+
+let refundCustomer = async (logement, lr, from, message) => {
+    return await stripe.refunds.create({
+        payment_intent: lr.pi,
+        reason: 'requested_by_customer',
+        refund_application_fee: false,
+        metadata: {
+            emailAnnonceurLogement: logement.emailAnnonceur,
+            emailDemandeurLogement: lr.emailDemandeur,
+            adresseLogement: logement.adresse,
+            debutReservation: lr.dateDebut,
+            finReservation: lr.dateFin,
+            messageAnnulation: message,
+            from: from
+        }
+    });
 }

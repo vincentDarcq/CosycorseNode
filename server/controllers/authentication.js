@@ -94,10 +94,12 @@ exports.signup = async (req, res) => {
   if (errUser !== "") {
     res.status(409).json(errUser)
   } else {
-    newUser.save((err) => {
-      if (err) { res.status(500).json("erreur serveur au signup") }
-      res.status(200).json(newUser)
+    const user = await newUser.save();
+    const token = jwt.sign({}, RSA_KEY_PRIVATE, {
+      algorithm: 'RS256',
+      subject: user._id.toString()
     })
+    res.status(200).json(token);
   }
 }
 

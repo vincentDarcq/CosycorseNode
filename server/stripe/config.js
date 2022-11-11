@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { 
     STRIPE_SECRET_KEY,
-    STRIPE_PUBLISHABLE_KEY
+    STRIPE_PUBLISHABLE_KEY,
+    STRIPE_CLIENT_ID
 } = require(`../tokens/${process.env.NODE_ENV}`);
 
 const {
@@ -59,21 +60,21 @@ router.get('/setup', async (req, res) => {
 })
   
 router.get('/response/setup', getUserFromToken, async (req, res) => {  
-try {
-    const code = req.query.code;  
-    let stripeConnectRequest = await makeStripeConnectRequest(code);  
-    let stripeUserId = stripeConnectRequest.data.stripe_user_id;  
-    if (!stripeUserId) {
-        console.log('StripeSetup.abort.no.stripeUserId');
-        return res.status(400).json({msg: 'Connect request to Stripe failed'});
+    try {
+        const code = req.query.code;  
+        let stripeConnectRequest = await makeStripeConnectRequest(code);  
+        let stripeUserId = stripeConnectRequest.data.stripe_user_id;  
+        if (!stripeUserId) {
+            console.log('StripeSetup.abort.no.stripeUserId');
+            return res.status(400).json({msg: 'Connect request to Stripe failed'});
+        }
+        updateUserAccount(res.locals.user, stripeUserId);
+        return res.status(200).json({status: 'ok'});
+    } catch (err) {
+        console.log('StripeSetup.error', err);
+        return res.status(400).json(err);
     }
-    updateUserAccount(res.locals.user, stripeUserId);
-    return res.status(200).json({status: 'ok'});
-} catch (err) {
-    console.log('StripeSetup.error', err);
-    return res.status(400).json(err);
-}
-})
+});
 
 router.get('/config', (req, res) => {
     res.send({

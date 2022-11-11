@@ -1,13 +1,15 @@
 const router = require('express').Router();
 
 const {
-  getUser,
+  getUserByLastName,
   editPass,
   deleteUser,
-  resetPass
-} = require('../controllers/user')
+  resetPass,
+  getUserByMail
+} = require('../controllers/user');
 
-router.get('/getUser', getUser);
+router.get('/getUserByLastName', getUserByLastName);
+router.get('/getUserByMail', getUserByMail);
 router.post('/editPass', editPass);
 router.post('/resetPass', resetPass);
 router.delete('/delete', deleteUser);

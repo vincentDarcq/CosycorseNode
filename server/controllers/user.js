@@ -36,11 +36,20 @@ exports.deletePicture = async (req, res, next) => {
   }
 }
 
-exports.getUser = async (req, res, next) => {
+exports.getUserByLastName = async (req, res, next) => {
   try {
     const user = await getUserByLastName(req.query.user);
-    res.status(200).json(user)
+    res.status(200).json(user);
   } catch (e) {
+    next(e);
+  }
+}
+
+exports.getUserByMail = async (req, res, next) => {
+  try {
+    const user = await getUserByMail(req.query.email);
+    res.status(200).json(user);
+  }catch(e){
     next(e);
   }
 }
