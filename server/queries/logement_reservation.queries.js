@@ -28,4 +28,8 @@ exports.getLogementReservationById = (logementReservationId) => {
 exports.deleteLogementReservationById = (logementReservationId) => {
   return LogementReservation.findByIdAndDelete(logementReservationId).exec();
 }
+
+exports.findLogementReservationsAcceptedAndNotPayed = () => {
+  return LogementReservation.find({ status : "acceptée", paye: false }).exec();
+}
   

@@ -5,6 +5,7 @@ const index = require('./routes/index');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+require('./cron/paiments-for-host');
 
 // Pour mapping avec mongoDB
 const mongoose = require('mongoose');
