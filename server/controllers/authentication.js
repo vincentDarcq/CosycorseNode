@@ -153,24 +153,22 @@ let generateTokenForCreateReservation = async (req, res, next) => {
   const token = jwt.sign({}, RSA_KEY_PRIVATE, {
     algorithm: 'RS256',
     subject: auth,
-    expiresIn: '1s'
+    expiresIn: '2s'
   });
   res.status(200).json(token);
 }
 
 let checkTokenForCreateReservation = async (req, res, next) => {
   const auth = req.headers.authorization;
-  const token = req.query.token
+  const token = req.headers.token
   if(auth){
     if(token){
       jwt.verify(token, RSA_PUBLIC_KEY, (err, decoded) => {
         if (err) { res.status(401).json(token_expired); }
         if(decoded){
           if(decoded.sub === auth){
-            console.log("OK")
             next();
           }else {
-            console.log("NOK")
             res.status(403).json(wrong_token);
           }
       }})
