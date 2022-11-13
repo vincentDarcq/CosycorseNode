@@ -51,13 +51,21 @@ let getByFiltres = async (req, res) => {
     req.query.lits = req.query.lits === 'undefined' ? null : req.query.lits;
     req.query.sdbs = req.query.sdbs === 'undefined' ? null : req.query.sdbs;
     req.query.prix = req.query.prix === 'undefined' ? null : req.query.prix;
+    req.query.latMin = req.query.latMin === 'undefined' ? null : req.query.latMin;
+    req.query.latMax = req.query.latMax === 'undefined' ? null : req.query.latMax;
+    req.query.longMin = req.query.longMin === 'undefined' ? null : req.query.longMin;
+    req.query.longMax = req.query.longMax === 'undefined' ? null : req.query.longMax;
     const logements = await getLogementsByFiltres(
         req.query.ville, 
         req.query.voyageurs, 
         req.query.lits, 
         req.query.sdbs, 
         req.query.prix,
-        req.query.equipements);
+        req.query.equipements,
+        req.query.latMin, 
+        req.query.latMax, 
+        req.query.longMin, 
+        req.query.longMax);
     res.status(200).json(logements);
 }
 
