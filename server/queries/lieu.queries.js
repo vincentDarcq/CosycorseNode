@@ -1,25 +1,33 @@
 const Lieu = require('../models/lieu.model');
 
-exports.createLieu = (lieu) => {
+let createLieu = (lieu) => {
     return lieu.save();
 }
 
-exports.getAllLieux = () => {
+let getAllLieux = () => {
     return Lieu.find({}).exec();
 }
 
-exports.getLieuById = (lieuId) => {
+let getLieuById = (lieuId) => {
     return Lieu.findById(lieuId).exec();
 }
 
-exports.findByIdAndUpdate = (id, lieu) => {
+let findByIdAndUpdate = (id, lieu) => {
     return Lieu.findByIdAndUpdate({ _id: id }, lieu, {new: true})
 }
 
-exports.getLieuxByFilters = (nom, ville, type) => {
+let getLieuxByFilters = (nom, ville, type) => {
     return Lieu.find({
         nom: nom ? nom : {$exists: true},
         ville: ville ? ville : {$exists: true},
         type: type ? type : {$exists: true}
     });
+}
+
+module.exports = {
+    createLieu,
+    getAllLieux,
+    getLieuById,
+    findByIdAndUpdate,
+    getLieuxByFilters
 }

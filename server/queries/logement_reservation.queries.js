@@ -1,35 +1,46 @@
 const LogementReservation = require('../models/logement_reservation.model');
 const ObjectId = require('mongodb').ObjectId;
 
-exports.saveLogementReservation = (logementReservation) => {
+let saveLogementReservation = (logementReservation) => {
   return logementReservation.save();
 }
 
-exports.updateLogementReservation = (logementReservation) => {
+let updateLogementReservation = (logementReservation) => {
   return LogementReservation.findByIdAndUpdate({ _id: logementReservation._id }, logementReservation, {new: true})
 }
 
-exports.getReservationsBylogementId = (logementId) => {
+let findReservationsBylogementId = (logementId) => {
   return LogementReservation.find({ logementId : ObjectId(logementId) }).exec();
 }
 
-exports.getReservationsByEmailDemandeur = (userEmail) => {
+let findReservationsByEmailDemandeur = (userEmail) => {
   return LogementReservation.find({ emailDemandeur : userEmail }).exec();
 }
 
-exports.getReservationsByEmailAnnonceur = (userEmail) => {
+let findReservationsByEmailAnnonceur = (userEmail) => {
   return LogementReservation.find({ emailAnnonceur : userEmail }).exec();
 }
 
-exports.getLogementReservationById = (logementReservationId) => {
+let getLogementReservationById = (logementReservationId) => {
   return LogementReservation.findById(logementReservationId).exec();
 }
 
-exports.deleteLogementReservationById = (logementReservationId) => {
+let deleteLogementReservationById = (logementReservationId) => {
   return LogementReservation.findByIdAndDelete(logementReservationId).exec();
 }
 
-exports.findLogementReservationsAcceptedAndNotPayed = () => {
+let findLogementReservationsAcceptedAndNotPayed = () => {
   return LogementReservation.find({ status : "acceptée", paye: false }).exec();
+}
+
+module.exports = {
+  saveLogementReservation,
+  updateLogementReservation,
+  findReservationsBylogementId,
+  findReservationsByEmailDemandeur,
+  findReservationsByEmailAnnonceur,
+  getLogementReservationById,
+  deleteLogementReservationById,
+  findLogementReservationsAcceptedAndNotPayed
 }
   

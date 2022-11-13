@@ -1,15 +1,15 @@
 const {
-    saveLogementReservation,
-    getReservationsBylogementId,
-    getLogementReservationById,
-    updateLogementReservation,
-    getReservationsByEmailDemandeur,
-    getReservationsByEmailAnnonceur
-} = require('../queries/logement_reservation.queries');
-
-const {
     newLogementReservation,
 } = require('../models/logement_reservation.model');
+
+const {
+    saveLogementReservation,
+    findReservationsBylogementId,
+    getLogementReservationById,
+    updateLogementReservation,
+    findReservationsByEmailDemandeur,
+    findReservationsByEmailAnnonceur
+} = require('../queries/logement_reservation.queries');
 
 const {
     getLogementById
@@ -23,29 +23,30 @@ const stripe = require('stripe')(STRIPE_SECRET_KEY);
 
 const { newRemboursement } = require('../models/remboursement_stripe.model');
 const { createRemboursement } = require('../queries/remboursement.queries');
+const { cancelation_not_possible_after_48h, not_cancel_because_empty_message } = require('../utils/reponses');
 
-exports.create = async (req, res, next) => {
+let create = async (req, res, next) => {
     const logementReservation = newLogementReservation(req);
     res.locals.lr =  await saveLogementReservation(logementReservation);
     return next();
 }
 
-exports.getReservationsByLogementId = async (req, res, next) => {
-    const logementReservations = await getReservationsBylogementId(req.query.logementId);
+let getReservationsByLogementId = async (req, res, next) => {
+    const logementReservations = await findReservationsBylogementId(req.query.logementId);
     res.status(200).json(logementReservations);
 }
 
-exports.getReservationsByEmailDemandeur = async (req, res, next) => {
-    const logementReservations = await getReservationsByEmailDemandeur(req.query.userEmail);
+let getReservationsByEmailDemandeur = async (req, res, next) => {
+    const logementReservations = await findReservationsByEmailDemandeur(req.query.userEmail);
     res.status(200).json(logementReservations);
 }
 
-exports.getReservationsByEmailAnnonceur = async (req, res, next) => {
-    const logementReservations = await getReservationsByEmailAnnonceur(req.query.userEmail);
+let getReservationsByEmailAnnonceur = async (req, res, next) => {
+    const logementReservations = await findReservationsByEmailAnnonceur(req.query.userEmail);
     res.status(200).json(logementReservations);
 }
 
-exports.getReservationByLogementReservationId = async (req, res, next) => {
+let getReservationByLogementReservationId = async (req, res, next) => {
     const logementReservation = await getLogementReservationById(req.query.logementReservationId);
     if(logementReservation){
         res.status(200).json(logementReservation);
@@ -54,7 +55,7 @@ exports.getReservationByLogementReservationId = async (req, res, next) => {
     }
 }
 
-exports.accepteReservation = async (req, res, next) => {
+let accepteReservation = async (req, res, next) => {
     try {
         let logementReservation = await getLogementReservationById(req.query.logementReservationId);
         if(logementReservation){
@@ -74,7 +75,7 @@ exports.accepteReservation = async (req, res, next) => {
     }
 }
 
-exports.rejectReservation = async (req, res, next) => {
+let rejectReservation = async (req, res, next) => {
     try {
         let logementReservation = await getLogementReservationById(req.query.logementReservationId);
         logementReservation.status === "refusée";
@@ -86,7 +87,7 @@ exports.rejectReservation = async (req, res, next) => {
     }
 }
 
-exports.cancelReservation = async (req, res, next) => {
+let cancelReservation = async (req, res, next) => {
     try {
         let lr;
         let logement;
@@ -108,7 +109,7 @@ exports.cancelReservation = async (req, res, next) => {
         if(jours >= 2){
             if(req.query.fromHost === "fromHost"){
                 if(req.body.message.length === 0){
-                    res.status(400).json("Votre message était vide, l'annulation n'a pas abouti");
+                    res.status(400).json(not_cancel_because_empty_message);
                 }else {
                     refund = await refundCustomer(logement, lr, 'host', req.body.message);
                 }
@@ -121,11 +122,22 @@ exports.cancelReservation = async (req, res, next) => {
             updateLogementReservation(lr);
             next();
         }else {
-            res.status(409).json("Une annulation n'est possible que 48h à l'avance, vous avez passé ce délais");
+            res.status(409).json(cancelation_not_possible_after_48h);
         }
     }catch(e){
         res.status(500).json("L'erreur suivante s'est produite: "+e);
     }
+}
+
+module.exports = {
+    create,
+    getReservationsByLogementId,
+    getReservationsByEmailDemandeur,
+    getReservationsByEmailAnnonceur,
+    getReservationByLogementReservationId,
+    accepteReservation,
+    rejectReservation,
+    cancelReservation
 }
 
 let refundCustomer = async (logement, lr, from, message) => {
@@ -144,3 +156,4 @@ let refundCustomer = async (logement, lr, from, message) => {
         }
     });
 }
+

@@ -1,41 +1,49 @@
 const User = require("../models/user.model");
 
-exports.getUsers = () => {
+let findUsers = () => {
   return User.find({}).exec();
 }
 
-exports.getUserById = (userId) => {
+let findUserById = (userId) => {
   return User.findById(userId).exec();
 }
 
-exports.findUsersForNamesStartWith = (value) => {
+let findUsersForNamesStartWith = (value) => {
   return User.find({ "name": { $regex: "^" + value } }).exec();
 }
 
-exports.getUserByMail = (email) => {
+let findUserByMail = (email) => {
   return User.findOne({ 'email': email });
 }
 
-exports.getUserByLastName = (name) => {
+let findUserByLastName = (name) => {
   return User.findOne({ 'lastName': name });
 }
 
-exports.findByIdAndUpdate = (id, user) => {
+let findByIdAndUpdate = (id, user) => {
   return User.findByIdAndUpdate({ _id: id }, user, {new: true})
 }
 
-exports.deleteUserByMail = (userEmail) => {
+let deleteUserByMail = (userEmail) => {
   return User.findOneAndDelete({ email: userEmail }).exec();
 }
 
-exports.addFriend = (name, ami) => {
-  return User.updateOne({ name: name }, { $push: { amis: ami } }).exec();
+let deleteUserById = (userId) => {
+  return User.findOneAndDelete({ _id: userId }).exec();
 }
 
-exports.deleteFriend = (name, ami) => {
-  return User.updateOne({ name: name }, { $pull: { amis: ami } }).exec();
-}
-
-exports.editUserPass = (email, pass) => {
+let editUserPass = (email, pass) => {
   return User.updateOne({ email: email }, { $set: { password: pass } });
+}
+
+module.exports = {
+  findUsers,
+  findUserById,
+  findUsersForNamesStartWith,
+  findUserByMail,
+  findUserByLastName,
+  findByIdAndUpdate,
+  deleteUserByMail,
+  deleteUserById,
+  editUserPass
 }

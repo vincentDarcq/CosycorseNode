@@ -12,7 +12,8 @@ const logementReservationSchema = Schema({
     pm: String,
     pi: String,
     logementId: { type: Schema.Types.ObjectId, ref: "logement" },
-    paye: Boolean
+    paye: Boolean,
+    logementExist: Boolean
 });
 
 logementReservationSchema.set('timestamps', true);
@@ -33,7 +34,8 @@ module.exports.newLogementReservation = function (req) {
         pm: req.body.pm,
         pi: req.body.pi,
         status: "attente",
-        paye: false
+        paye: false,
+        logementExist: true
     });
     return newLogement;
 }

@@ -5,12 +5,14 @@ const {
     uploadImages,
     getByAnnonceur,
     deleteLogement,
-    deleteImage,
+    deletionImageFromFront,
     updateLogement,
     getRecentLogement,
-    getLogementById,
+    findLogementById,
     getRecentLogementForVille,
-    getByFiltres
+    getByFiltres,
+    cacherAnnonce,
+    exposerAnnonce
 } = require('../controllers/logement')
 
 router.post('/create', create);
@@ -21,10 +23,12 @@ router.post('/uploadImages', storage.fields([{ name: 'image1' }, { name: 'image2
 router.get('/getByAnnonceur', getByAnnonceur);
 router.get('/getRandom', getRecentLogement);
 router.get('/getByFiltres', getByFiltres);
-router.get('/getLogementById', getLogementById);
+router.get('/getLogementById', findLogementById);
 router.get('/getRandomForVille', getRecentLogementForVille);
 router.get('/delete', deleteLogement);
 router.post('/update', updateLogement);
-router.get('/deleteImage', deleteImage);
+router.get('/cacherAnnonce', cacherAnnonce);
+router.get('/exposerAnnonce', exposerAnnonce);
+router.get('/deleteImage', deletionImageFromFront);
 
 module.exports = router;

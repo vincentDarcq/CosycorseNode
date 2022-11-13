@@ -6,6 +6,7 @@ const {
     updateLogementReservation
 } = require('../queries/logement_reservation.queries');
 const { getUserByMail } = require('../queries/user.queries');
+const { getDateFromStringDate } = require('../utils/dates');
 
 const { 
     STRIPE_SECRET_KEY
@@ -20,6 +21,7 @@ cron.schedule('0 0 * * *', async () => {
 
 let transfertOnHostAccountForStartedReservations = async () => {
     const now = new Date();
+    now.setHours(now.getHours()+1);
     const lr = await findLogementReservationsAcceptedAndNotPayed();
     lr.forEach( async logRes => {
         const dd = getDateFromStringDate(logRes.dateDebut);
@@ -49,16 +51,4 @@ let transfertOnHostAccountForStartedReservations = async () => {
             }
         }
     });
-}
-
-let getDateFromStringDate = (date) => {
-    const d = new Date();
-    d.setDate(parseInt(date.split('/')[0]));
-    d.setMonth(parseInt(date.split('/')[1])-1);
-    d.setFullYear(parseInt(date.split('/')[2]));
-    d.setHours(1);
-    d.setMinutes(0);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
-    return d;
 }

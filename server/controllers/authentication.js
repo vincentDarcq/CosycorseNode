@@ -7,12 +7,23 @@ const RSA_PUBLIC_KEY = fs.readFileSync('./rsa/key.pub');
 const RSA_KEY_PRIVATE = fs.readFileSync('./rsa/key');
 
 const { 
-  getUsers, 
-  getUserByMail,
-  getUserById
+  findUsers, 
+  findUserByMail,
+  findUserById
 } = require('../queries/user.queries');
+const { 
+  signin_failed, 
+  check_authent_failed, 
+  link_expired, 
+  unknow_mail, 
+  no_token,
+  email_already_exist,
+  token_expired,
+  ok,
+  wrong_token
+} = require('../utils/reponses');
 
-exports.refresh_token = async (req, res) => {
+let refresh_token = async (req, res) => {
   const token = req.headers.authorization;
   if (token) {
     jwt.verify(token, RSA_PUBLIC_KEY, (err, decoded) => {
@@ -28,17 +39,17 @@ exports.refresh_token = async (req, res) => {
   }
 }
 
-exports.getUserFromToken = async (req, res, next) => {
+let getUserFromToken = async (req, res, next) => {
   const token = req.headers.authorization;
   jwt.verify(token, RSA_PUBLIC_KEY, async (err, decoded) => {
     if (err) { res.status(401).json('token invalid'); }
     const sub = decoded.sub;
-    res.locals.user = await getUserById(sub);
+    res.locals.user = await findUserById(sub);
     next();
   })
 }
 
-exports.isLoggedIn = async (req, res, next) => {
+let isLoggedIn = async (req, res, next) => {
   const token = req.headers.authorization;
   if (token) {
     jwt.verify(token, RSA_PUBLIC_KEY, (err, decoded) => {
@@ -51,13 +62,13 @@ exports.isLoggedIn = async (req, res, next) => {
       })
     })
   } else {
-    res.status(401).json('pas de token');
+    res.status(401).json(no_token);
   }
 }
 
-exports.signin = async (req, res, next) => {
+let signin = async (req, res, next) => {
   try {
-    getUserByMail(req.body.email).exec((err, user) => {
+    findUserByMail(req.body.email).exec((err, user) => {
       if (err) { res.status(500).json(err) }
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         const token = jwt.sign({}, RSA_KEY_PRIVATE, {
@@ -66,7 +77,7 @@ exports.signin = async (req, res, next) => {
         })
         res.status(200).json(token)
       } else {
-        res.status(401).json('signin fail');
+        res.status(401).json(signin_failed);
       }
     });
   } catch (e) {
@@ -74,7 +85,7 @@ exports.signin = async (req, res, next) => {
   }
 }
 
-exports.signup = async (req, res) => {
+let signup = async (req, res) => {
   const newUser = new User({
     email: req.body.email,
     firstName: req.body.prenom,
@@ -84,10 +95,10 @@ exports.signup = async (req, res) => {
   })
 
   let errUser = "";
-  const users = await getUsers();
+  const users = await findUsers();
   users.forEach((user) => {
     if (user.email === newUser.email) {
-      errUser = "Cet email est déjà enregistré";
+      errUser = email_already_exist;
     }
   })
 
@@ -103,10 +114,10 @@ exports.signup = async (req, res) => {
   }
 }
 
-exports.generateTokenForResetPwd = async (req, res, next) => {
+let generateTokenForResetPwd = async (req, res, next) => {
   const mail = req.query.mail;
   try {
-    getUserByMail(req.query.mail).exec((err, user) => {
+    findUserByMail(req.query.mail).exec((err, user) => {
       if (err) { res.status(500).json(err) }
       if(user){
         const token = jwt.sign({}, RSA_KEY_PRIVATE, {
@@ -117,7 +128,7 @@ exports.generateTokenForResetPwd = async (req, res, next) => {
         res.locals.token = token;
         return next();
       }else {
-        res.status(404).json("Adresse email inconnue")
+        res.status(404).json(unknow_mail);
       }
     })
   } catch (e) {
@@ -125,15 +136,60 @@ exports.generateTokenForResetPwd = async (req, res, next) => {
   }
 }
 
-exports.authentWithToken = async (req, res, next) => {
+let authentWithToken = async (req, res, next) => {
   jwt.verify(req.query.token, RSA_PUBLIC_KEY, (err, decoded) => {
-    if (err) { res.status(401).json('Ce lien a expiré'); }
+    if (err) { res.status(401).json(link_expired); }
     if(decoded){
-      console.log("good token")
       const email = decoded.sub;
-      getUserByMail(email).exec((err, user) => {
-        if (err || !user) { res.status(500).json('error') }
+      findUserByMail(email).exec((err, user) => {
+        if (err || !user) { res.status(500).json(err) }
         res.status(200).json(user);
       })
-    }})
+  }})
+}
+
+let generateTokenForCreateReservation = async (req, res, next) => {
+  const auth = req.headers.authorization;
+  const token = jwt.sign({}, RSA_KEY_PRIVATE, {
+    algorithm: 'RS256',
+    subject: auth,
+    expiresIn: '1s'
+  });
+  res.status(200).json(token);
+}
+
+let checkTokenForCreateReservation = async (req, res, next) => {
+  const auth = req.headers.authorization;
+  const token = req.query.token
+  if(auth){
+    if(token){
+      jwt.verify(token, RSA_PUBLIC_KEY, (err, decoded) => {
+        if (err) { res.status(401).json(token_expired); }
+        if(decoded){
+          if(decoded.sub === auth){
+            console.log("OK")
+            next();
+          }else {
+            console.log("NOK")
+            res.status(403).json(wrong_token);
+          }
+      }})
+    }else {
+      res.status(403).json(no_token);
+    }
+  }else {
+    res.status(403).json(check_authent_failed);
+  }
+}
+
+module.exports = {
+  refresh_token,
+  getUserFromToken,
+  isLoggedIn,
+  signin,
+  signup,
+  generateTokenForResetPwd,
+  authentWithToken,
+  generateTokenForCreateReservation,
+  checkTokenForCreateReservation
 }

@@ -12,24 +12,24 @@ const {
     editLieu
 } = require('../models/lieu.model');
 
-exports.create = async (req, res) => {
+let create = async (req, res) => {
     const logement = newLieu(req, res);
     const l = await createLieu(logement);
     res.status(200).json(l);
 }
 
-exports.updateLieu = async (req, res) => {
+let updateLieu = async (req, res) => {
     const lieu = editLieu(req, res);
     const lieuUpdated = await findByIdAndUpdate(req.query.lieuId, lieu);
     res.status(200).json(lieuUpdated);
 }
 
-exports.getAll = async (req, res) => {
+let getAll = async (req, res) => {
     const lieux = await getAllLieux();
     res.status(200).json(lieux);
 }
 
-exports.findByFilters = async (req, res) => {
+let findByFilters = async (req, res) => {
     req.query.nom = req.query.nom === 'undefined' ? null : req.query.nom;
     req.query.ville = req.query.ville === 'undefined' ? null : req.query.ville;
     req.query.type = req.query.type === 'undefined' ? null : req.query.type;
@@ -40,7 +40,7 @@ exports.findByFilters = async (req, res) => {
     res.status(200).json(lieux);
 }
 
-exports.uploadImages = async (req, res) => {
+let uploadImages = async (req, res) => {
     util.inspect(req.files, { compact: false, depth: 5, breakLength: 80, color: true });
     const lieu = await getLieuById(req.query.lieuId);
     if (lieu.images === null) {
@@ -128,7 +128,15 @@ exports.uploadImages = async (req, res) => {
     res.status(200).json(updatedLieu);
 }
 
-deleteImage = (imageToRemove) => {
+module.exports = {
+    create,
+    updateLieu,
+    getAll,
+    findByFilters,
+    uploadImages
+}
+
+let deleteImage = (imageToRemove) => {
     fs.unlink(path.join(__dirname, `../upload/${imageToRemove}`), err => {
         if (err) throw err;
     });

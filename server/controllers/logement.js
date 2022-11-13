@@ -5,22 +5,23 @@ const { villes } = require('../models/villes');
 const {
     createLogement,
     findByIdAndUpdate,
-    getLogementByAnnonceur,
     deleteOne,
     getLogementById,
     getLogementsByVilleRecentToOld,
-    getLogementsByFiltres
+    getLogementsByFiltres,
+    getLogementByEmailAnnonceur
 } = require('../queries/logement.queries');
 
 const {
     newLogement,
     editLogement
 } = require('../models/logement.model');
+const { adresse_not_in_corse } = require('../utils/reponses');
 
-exports.create = async (req, res) => {
+let create = async (req, res) => {
     if((req.body.longitude < 7.975044250488282 || req.body.longitude > 9.644966125488283)
       && (req.body.latitude < 41.35774173825274 || req.body.latitude > 43.06637963617605)){
-        res.status(400).json("Cette adresse n'est pas en Corse");
+        res.status(400).json(adresse_not_in_corse);
     }else {
         const logement = newLogement(req, res);
         const l = await createLogement(logement);
@@ -28,12 +29,12 @@ exports.create = async (req, res) => {
     }
 }
 
-exports.getByAnnonceur = async (req, res) => {
-    const logements = await getLogementByAnnonceur(req.query.emailAnnonceur);
+let getByAnnonceur = async (req, res) => {
+    const logements = await getLogementByEmailAnnonceur(req.query.emailAnnonceur);
     res.status(200).json(logements);
 }
 
-exports.getRecentLogement = async (req, res) => {
+let getRecentLogement = async (req, res) => {
     let logements = [];
     for (let ville of villes) {
         const l = await getLogementsByVilleRecentToOld(ville);
@@ -44,7 +45,7 @@ exports.getRecentLogement = async (req, res) => {
     res.status(200).json(logements);
 }
 
-exports.getByFiltres = async (req, res) => {
+let getByFiltres = async (req, res) => {
     req.query.ville = req.query.ville === 'undefined' ? null : req.query.ville;
     req.query.voyageurs = req.query.voyageurs === 'undefined' ? null : req.query.voyageurs;
     req.query.lits = req.query.lits === 'undefined' ? null : req.query.lits;
@@ -60,12 +61,12 @@ exports.getByFiltres = async (req, res) => {
     res.status(200).json(logements);
 }
 
-exports.getLogementById = async (req, res) => {
+let findLogementById = async (req, res) => {
     const l = await getLogementById(req.query.logementId);
     res.status(200).json(l);
 }
 
-exports.getRecentLogementForVille = async (req, res) => {
+let getRecentLogementForVille = async (req, res) => {
     const l = await getLogementsByVilleRecentToOld(req.query.ville);
     if (l.length > 0) {
         res.status(200).json(l[0]);
@@ -74,18 +75,32 @@ exports.getRecentLogementForVille = async (req, res) => {
     }
 }
 
-exports.deleteLogement = async (req, res) => {
+let deleteLogement = async (req, res) => {
     const logementDeleted = await deleteOne(req.query.logementId);
     res.status(200).json(logementDeleted);
 }
 
-exports.updateLogement = async (req, res) => {
+let updateLogement = async (req, res) => {
     const logement = editLogement(req, res);
     const logementUpdated = await findByIdAndUpdate(req.query.logementId, logement);
     res.status(200).json(logementUpdated);
 }
 
-exports.deleteImage = async (req, res) => {
+let cacherAnnonce = async (req, res) => {
+    const logement = await getLogementById(req.query.logementId);
+    logement.exposer = false;
+    const logementUpdated = await findByIdAndUpdate(req.query.logementId, logement);
+    res.status(200).json(logementUpdated);
+}
+
+let exposerAnnonce = async (req, res) => {
+    const logement = await getLogementById(req.query.logementId);
+    logement.exposer = true;
+    const logementUpdated = await findByIdAndUpdate(req.query.logementId, logement);
+    res.status(200).json(logementUpdated);
+}
+
+let deletionImageFromFront = async (req, res) => {
     const logement = await getLogementById(req.query.logementId);
     deleteImage(logement.images[parseInt(req.query.indexImage)]);
     logement.images.splice(parseInt(req.query.indexImage), 1);
@@ -93,7 +108,7 @@ exports.deleteImage = async (req, res) => {
     res.status(200).json(updatedLogement);
 }
 
-exports.uploadImages = async (req, res) => {
+let uploadImages = async (req, res) => {
     util.inspect(req.files, { compact: false, depth: 5, breakLength: 80, color: true });
     const logement = await getLogementById(req.query.logementId);
     if (logement.images === null) {
@@ -185,4 +200,20 @@ let deleteImage = (imageToRemove) => {
     fs.unlink(path.join(__dirname, `../upload/${imageToRemove}`), err => {
         if (err) throw err;
     });
+}
+
+module.exports = { 
+    create, 
+    getByAnnonceur, 
+    getRecentLogement, 
+    getByFiltres, 
+    findLogementById,
+    getRecentLogementForVille,
+    deleteLogement,
+    updateLogement,
+    deletionImageFromFront,
+    uploadImages,
+    deleteImage,
+    cacherAnnonce,
+    exposerAnnonce
 }

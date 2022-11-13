@@ -16,8 +16,9 @@ const {
     sendCancelationFromTravelerForLogementReservation,
     sendCancelationFromHostForLogementReservation
  } = require('../controllers/emails');
+const { checkTokenForCreateReservation } = require('../controllers/authentication');
 
-router.post('/create', create, sendMailForBooking);
+router.post('/create', checkTokenForCreateReservation, create, sendMailForBooking);
 router.get('/getReservationsByLogementId', getReservationsByLogementId);
 router.get('/getReservationsByDemandeurEmail', getReservationsByEmailDemandeur);
 router.get('/getReservationsByAnnonceurEmail', getReservationsByEmailAnnonceur);

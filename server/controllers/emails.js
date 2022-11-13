@@ -3,8 +3,7 @@ const {
   user,
   password
 } = require('../rsa/nodemailerpass');
-const { getUserByMail } = require('../queries/user.queries');
-const { getLogementByEmailAnnonceur } = require('../queries/logement.queries');
+const { findUserByMail } = require('../queries/user.queries');
 const env = require(`../environment/${process.env.NODE_ENV}`);
 
 const transporter = nodeMailer.createTransport({
@@ -30,7 +29,7 @@ let mailOptions = (to, subject, text, html) => {
   };
 }
 
-exports.contactHost = async (req, res, next) => {
+let contactHost = async (req, res, next) => {
   const html =  `<b>Vous avez un message :</b>
                 <br><br>${req.body.message}<br>
                 <b>Répondre à : ${req.body.from}</b>`
@@ -45,7 +44,7 @@ exports.contactHost = async (req, res, next) => {
   });
 }
 
-exports.forgotPassword = async (req, res, next) => {
+let forgotPassword = async (req, res, next) => {
   const html = 
   `<div style="
             background-color: white;
@@ -68,7 +67,7 @@ exports.forgotPassword = async (req, res, next) => {
   });
 }
 
-exports.sendMailForBooking = async (req, res, next) => {
+let sendMailForBooking = async (req, res, next) => {
   const html = 
   `<div style="
             background-color: white;
@@ -108,7 +107,7 @@ exports.sendMailForBooking = async (req, res, next) => {
   });
 }
 
-exports.sendConfirmationForLogementReservation = async (req, res, next) => {
+let sendConfirmationForLogementReservation = async (req, res, next) => {
   const html = 
   `<div style="
           background-color: white;
@@ -148,7 +147,7 @@ exports.sendConfirmationForLogementReservation = async (req, res, next) => {
   });
 }
 
-exports.sendRejectionForLogementReservation = async (req, res, next) => {
+let sendRejectionForLogementReservation = async (req, res, next) => {
   const html = 
   `<div style="
             background-color: white;
@@ -175,8 +174,8 @@ exports.sendRejectionForLogementReservation = async (req, res, next) => {
   });
 }
 
-exports.sendCancelationFromTravelerForLogementReservation = async (req, res, next) => {
-  const customer = await getUserByMail(req.body.monCompteReservation.logementReservation.emailDemandeur);
+let sendCancelationFromTravelerForLogementReservation = async (req, res, next) => {
+  const customer = await findUserByMail(req.body.monCompteReservation.logementReservation.emailDemandeur);
   const html = req.body.message.length > 0 ? 
     `<div style="
               background-color: white;
@@ -215,8 +214,8 @@ exports.sendCancelationFromTravelerForLogementReservation = async (req, res, nex
   });
 }
 
-exports.sendCancelationFromHostForLogementReservation = async (req, res, next) => {
-  const customer = await getUserByMail(req.body.monCompteReservation.logementReservation.emailAnnonceur);
+let sendCancelationFromHostForLogementReservation = async (req, res, next) => {
+  const customer = await findUserByMail(req.body.monCompteReservation.logementReservation.emailAnnonceur);
   const html = 
   `<div style="
             background-color: white;
@@ -242,4 +241,14 @@ exports.sendCancelationFromHostForLogementReservation = async (req, res, next) =
     console.log('Message %s sent: %s', info.messageId, info.response);
     res.status(200).json("Un mail d'annulation vient d'être envoyé au voyageur");
   });
+}
+
+module.exports = {
+  contactHost,
+  forgotPassword,
+  sendMailForBooking,
+  sendConfirmationForLogementReservation,
+  sendRejectionForLogementReservation,
+  sendCancelationFromTravelerForLogementReservation,
+  sendCancelationFromHostForLogementReservation
 }

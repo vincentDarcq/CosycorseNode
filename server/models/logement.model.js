@@ -17,7 +17,8 @@ const logementSchema = Schema({
     images: [String],
     fumeur: Boolean,
     animaux: Boolean,
-    access_handicap: Boolean
+    access_handicap: Boolean,
+    exposer: Boolean
 });
 
 logementSchema.set('timestamps', true);
@@ -43,6 +44,7 @@ module.exports.newLogement = function (req) {
         fumeur: req.body.fumeur,
         animaux: req.body.animaux,
         access_handicap: req.body.access_handicap,
+        exposer: true,
         images: null
     });
     return newLogement;
@@ -65,6 +67,7 @@ module.exports.editLogement = function (req) {
         fumeur: req.body.fumeur,
         animaux: req.body.animaux,
         access_handicap: req.body.access_handicap,
+        exposer: req.body.exposer,
         images: req.body.images
     };
     return editLogement;
