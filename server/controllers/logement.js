@@ -17,6 +17,8 @@ const {
     editLogement
 } = require('../models/logement.model');
 const { adresse_not_in_corse } = require('../utils/reponses');
+const { findReservationsBylogementId } = require('../queries/logement_reservation.queries');
+const { getDateFromStringDate } = require('../utils/dates');
 
 let create = async (req, res) => {
     if((req.body.longitude < 7.975044250488282 || req.body.longitude > 9.644966125488283)
@@ -46,6 +48,15 @@ let getRecentLogement = async (req, res) => {
 }
 
 let getByFiltres = async (req, res) => {
+    let dd, df;
+    if(req.query.dateDebut.length > 0){
+        dd = new Date(req.query.dateDebut);
+        dd.setHours(dd.getHours()+1);
+    }
+    if(req.query.dateFin.length > 0){
+        df = new Date(req.query.dateFin);
+        df.setHours(df.getHours()+1);
+    }
     req.query.ville = req.query.ville === 'undefined' ? null : req.query.ville;
     req.query.voyageurs = req.query.voyageurs === 'undefined' ? null : req.query.voyageurs;
     req.query.lits = req.query.lits === 'undefined' ? null : req.query.lits;
@@ -65,7 +76,25 @@ let getByFiltres = async (req, res) => {
         req.query.latMin, 
         req.query.latMax, 
         req.query.longMin, 
-        req.query.longMax);
+        req.query.longMax
+    );
+    if(dd && df){
+        let indexes = [];
+        for(let i = 0; i < logements.length; i++){
+            const lrs = await findReservationsBylogementId(logements[i]._id.toHexString());
+            lrs.forEach(lr => {
+                const db = getDateFromStringDate(lr.dateDebut);
+                const de = getDateFromStringDate(lr.dateFin);
+                if((dd.getTime() > db.getTime() && dd.getTime() < de.getTime())
+                    || (df.getTime() > db.getTime() && df.getTime() < de.getTime())){
+                    indexes.push(i);
+                }
+            })
+        }
+        indexes.forEach(i => {
+            logements.splice(i, 1);
+        })
+    }
     res.status(200).json(logements);
 }
 
