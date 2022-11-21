@@ -8,7 +8,7 @@ let getAllLieux = () => {
     return Lieu.find({}).exec();
 }
 
-let getLieuById = (lieuId) => {
+let findLieuById = (lieuId) => {
     return Lieu.findById(lieuId).exec();
 }
 
@@ -27,7 +27,7 @@ let getLieuxByFilters = (nom, ville, type) => {
 module.exports = {
     createLieu,
     getAllLieux,
-    getLieuById,
+    findLieuById,
     findByIdAndUpdate,
     getLieuxByFilters
 }

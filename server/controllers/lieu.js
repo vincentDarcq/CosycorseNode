@@ -1,8 +1,9 @@
 const fs = require('fs');
 const util = require('util');
+const path = require('path');
 const {
     createLieu,
-    getLieuById,
+    findLieuById,
     findByIdAndUpdate,
     getAllLieux,
     getLieuxByFilters
@@ -24,6 +25,11 @@ let updateLieu = async (req, res) => {
     res.status(200).json(lieuUpdated);
 }
 
+let getById = async (req, res) => {
+    const lieu = await findLieuById(req.query.lieuId);
+    res.status(200).json(lieu);
+}
+
 let getAll = async (req, res) => {
     const lieux = await getAllLieux();
     res.status(200).json(lieux);
@@ -42,7 +48,7 @@ let findByFilters = async (req, res) => {
 
 let uploadImages = async (req, res) => {
     util.inspect(req.files, { compact: false, depth: 5, breakLength: 80, color: true });
-    const lieu = await getLieuById(req.query.lieuId);
+    const lieu = await findLieuById(req.query.lieuId);
     if (lieu.images === null) {
         lieu.images = [];
     }
@@ -128,16 +134,26 @@ let uploadImages = async (req, res) => {
     res.status(200).json(updatedLieu);
 }
 
-module.exports = {
-    create,
-    updateLieu,
-    getAll,
-    findByFilters,
-    uploadImages
+let deletionImageFromFront = async (req, res) => {
+    const lieu = await findLieuById(req.query.lieuId);
+    deleteImage(lieu.images[parseInt(req.query.indexImage)]);
+    lieu.images.splice(parseInt(req.query.indexImage), 1);
+    const updatedLieu = await findByIdAndUpdate(req.query.logementId, logement);
+    res.status(200).json(updatedLieu);
 }
 
 let deleteImage = (imageToRemove) => {
     fs.unlink(path.join(__dirname, `../upload/${imageToRemove}`), err => {
         if (err) throw err;
     });
+}
+
+module.exports = {
+    create,
+    updateLieu,
+    getAll,
+    findByFilters,
+    uploadImages,
+    getById,
+    deletionImageFromFront
 }
