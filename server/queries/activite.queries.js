@@ -1,7 +1,17 @@
 const Activite = require('../models/activite.model');
 
-let createActivite = (activite) => {
-    return activite.save();
+let createActivite = (req) => {
+    return new Activite({
+        titre: req.body.titre,
+        proposeur: req.body.proposeur,
+        ville: req.body.ville,
+        type: req.body.type,
+        description: req.body.description,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        duree: req.body.duree,
+        images: null
+    }).save();
 }
 
 let findAllActivites = () => {
@@ -23,7 +33,6 @@ let findActivitesByFilters = (titre, ville, type) => {
         type: type ? type : {$exists: true}
     });
 }
-
 
 module.exports = {
     createActivite,

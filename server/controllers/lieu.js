@@ -6,20 +6,14 @@ const {
     findAllLieux,
     findLieuxByFilters
 } = require('../queries/lieu.queries');
-const {
-    newLieu,
-    editLieu
-} = require('../models/lieu.model');
 const { deleteImage } = require('../utils/images');
 
 let create = async (req, res) => {
-    const logement = newLieu(req, res);
-    const l = await createLieu(logement);
+    const l = await createLieu(req);
     res.status(200).json(l);
 }
 
 let updateLieu = async (req, res) => {
-    const lieu = editLieu(req, res);
     const lieuUpdated = await findByIdAndUpdate(req.query.lieuId, lieu);
     res.status(200).json(lieuUpdated);
 }

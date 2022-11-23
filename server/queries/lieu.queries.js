@@ -1,7 +1,16 @@
 const Lieu = require('../models/lieu.model');
 
-let createLieu = (lieu) => {
-    return lieu.save();
+let createLieu = (req) => {
+    return new Lieu({
+        nom: req.body.nom,
+        ville: req.body.ville,
+        type: req.body.type,
+        description: req.body.description,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        annonceur: req.body.annonceur,
+        images: null
+    }).save();
 }
 
 let findAllLieux = () => {

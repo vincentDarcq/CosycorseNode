@@ -10,10 +10,6 @@ const {
     getLogementByEmailAnnonceur
 } = require('../queries/logement.queries');
 
-const {
-    newLogement,
-    editLogement
-} = require('../models/logement.model');
 const { adresse_not_in_corse } = require('../utils/reponses');
 const { findReservationsBylogementId } = require('../queries/logement_reservation.queries');
 const { getDateFromStringDate } = require('../utils/dates');
@@ -24,8 +20,7 @@ let create = async (req, res) => {
       && (req.body.latitude < 41.35774173825274 || req.body.latitude > 43.06637963617605)){
         res.status(400).json(adresse_not_in_corse);
     }else {
-        const logement = newLogement(req, res);
-        const l = await createLogement(logement);
+        const l = await createLogement(req);
         res.status(200).json(l);
     }
 }
@@ -117,8 +112,7 @@ let deleteLogement = async (req, res) => {
 }
 
 let updateLogement = async (req, res) => {
-    const logement = editLogement(req, res);
-    const logementUpdated = await findByIdAndUpdate(req.query.logementId, logement);
+    const logementUpdated = await findByIdAndUpdate(req.query.logementId, req.body);
     res.status(200).json(logementUpdated);
 }
 

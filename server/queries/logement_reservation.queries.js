@@ -1,8 +1,21 @@
 const LogementReservation = require('../models/logement_reservation.model');
 const ObjectId = require('mongodb').ObjectId;
 
-let saveLogementReservation = (logementReservation) => {
-  return logementReservation.save();
+let saveLogementReservation = (req) => {
+  return new LogementReservation({
+    dateDebut: req.body.dateDebut,
+    dateFin: req.body.dateFin,
+    message: req.body.message,
+    prix: req.body.prix,
+    emailDemandeur: req.body.emailDemandeur,
+    emailAnnonceur: req.body.emailAnnonceur,
+    logementId: req.body.logementId,
+    pm: req.body.pm,
+    pi: req.body.pi,
+    status: "attente",
+    paye: false,
+    logementExist: true
+  }).save();
 }
 
 let updateLogementReservation = (logementReservation) => {

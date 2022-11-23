@@ -1,8 +1,4 @@
 const {
-    newLogementReservation,
-} = require('../models/logement_reservation.model');
-
-const {
     saveLogementReservation,
     findReservationsBylogementId,
     getLogementReservationById,
@@ -23,12 +19,14 @@ const stripe = require('stripe')(STRIPE_SECRET_KEY);
 
 const { newRemboursement } = require('../models/remboursement_stripe.model');
 const { createRemboursement } = require('../queries/remboursement.queries');
-const { cancelation_not_possible_after_48h, not_cancel_because_empty_message } = require('../utils/reponses');
+const { 
+    cancelation_not_possible_after_48h, 
+    not_cancel_because_empty_message 
+} = require('../utils/reponses');
 
 let create = async (req, res, next) => {
-    const logementReservation = newLogementReservation(req);
-    res.locals.lr =  await saveLogementReservation(logementReservation);
-    return next();
+    res.locals.lr =  await saveLogementReservation(req);
+    next();
 }
 
 let getReservationsByLogementId = async (req, res, next) => {

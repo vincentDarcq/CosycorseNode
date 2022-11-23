@@ -1,7 +1,25 @@
 const Logement = require('../models/logement.model');
 
-let createLogement = (logement) => {
-  return logement.save();
+let createLogement = (req) => {
+  return new Logement({
+    adresse: req.body.adresse,
+    ville: req.body.ville,
+    description: req.body.description,
+    logement: req.body.logement,
+    voyageurs: req.body.voyageurs,
+    lits: req.body.lits,
+    sdbs: req.body.sdbs,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    annonceur: req.body.annonceur,
+    prix: req.body.prix,
+    equipements: req.body.equipements,
+    fumeur: req.body.fumeur,
+    animaux: req.body.animaux,
+    access_handicap: req.body.access_handicap,
+    exposer: true,
+    images: null
+  }).save();
 }
 
 let getAllLogement = () => {

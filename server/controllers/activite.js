@@ -1,8 +1,5 @@
 const util = require('util');
 const { 
-    newActivite
-} = require("../models/activite.model");
-const { 
     createActivite, 
     findActiviteById,
     findActiviteByIdAndUpdate,
@@ -12,8 +9,7 @@ const {
 const { deleteImage } = require('../utils/images');
 
 let create = async (req, res) => {
-    const activite = newActivite(req, res);
-    const a = await createActivite(activite);
+    const a = await createActivite(req);
     res.status(200).json(a);
 }
 
