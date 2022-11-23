@@ -4,7 +4,7 @@ let createLieu = (lieu) => {
     return lieu.save();
 }
 
-let getAllLieux = () => {
+let findAllLieux = () => {
     return Lieu.find({}).exec();
 }
 
@@ -16,9 +16,9 @@ let findByIdAndUpdate = (id, lieu) => {
     return Lieu.findByIdAndUpdate({ _id: id }, lieu, {new: true})
 }
 
-let getLieuxByFilters = (nom, ville, type) => {
+let findLieuxByFilters = (nom, ville, type) => {
     return Lieu.find({
-        nom: nom ? nom : {$exists: true},
+        nom: nom ? { $regex: nom, $options : 'i'} : {$exists: true},
         ville: ville ? ville : {$exists: true},
         type: type ? type : {$exists: true}
     });
@@ -26,8 +26,8 @@ let getLieuxByFilters = (nom, ville, type) => {
 
 module.exports = {
     createLieu,
-    getAllLieux,
+    findAllLieux,
     findLieuById,
     findByIdAndUpdate,
-    getLieuxByFilters
+    findLieuxByFilters
 }

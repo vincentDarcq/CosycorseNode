@@ -1,6 +1,4 @@
-const fs = require('fs');
 const util = require('util');
-const path = require('path');
 const { villes } = require('../models/villes');
 const {
     createLogement,
@@ -19,6 +17,7 @@ const {
 const { adresse_not_in_corse } = require('../utils/reponses');
 const { findReservationsBylogementId } = require('../queries/logement_reservation.queries');
 const { getDateFromStringDate } = require('../utils/dates');
+const { deleteImage } = require('../utils/images');
 
 let create = async (req, res) => {
     if((req.body.longitude < 7.975044250488282 || req.body.longitude > 9.644966125488283)
@@ -233,12 +232,6 @@ let uploadImages = async (req, res) => {
     res.status(200).json(updatedLogement);
 }
 
-let deleteImage = (imageToRemove) => {
-    fs.unlink(path.join(__dirname, `../upload/${imageToRemove}`), err => {
-        if (err) throw err;
-    });
-}
-
 module.exports = { 
     create, 
     getByAnnonceur, 
@@ -250,7 +243,6 @@ module.exports = {
     updateLogement,
     deletionImageFromFront,
     uploadImages,
-    deleteImage,
     cacherAnnonce,
     exposerAnnonce
 }
