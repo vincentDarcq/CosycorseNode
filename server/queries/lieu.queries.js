@@ -25,11 +25,13 @@ let findByIdAndUpdate = (id, lieu) => {
     return Lieu.findByIdAndUpdate({ _id: id }, lieu, {new: true})
 }
 
-let findLieuxByFilters = (nom, ville, type) => {
+let findLieuxByFilters = (nom, ville, type, latMin, latMax, longMin, longMax) => {
     return Lieu.find({
         nom: nom ? { $regex: nom, $options : 'i'} : {$exists: true},
         ville: ville ? ville : {$exists: true},
-        type: type ? type : {$exists: true}
+        type: type ? type : {$exists: true},
+        latitude: latMax & latMin ? { $lte: latMax, $gte: latMin } : {$exists: true}, 
+        longitude: longMax & longMin ? { $lte: longMax, $gte: longMin } : {$exists: true}
     });
 }
 

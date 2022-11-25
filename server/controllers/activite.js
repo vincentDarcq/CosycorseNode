@@ -13,19 +13,34 @@ let create = async (req, res) => {
     res.status(200).json(a);
 }
 
+let updateActivite = async (req, res) => {
+    const activiteUpdated = await findByIdAndUpdate(req.query.activiteId, req.body);
+    res.status(200).json(activiteUpdated);
+}
+
 let getAll = async (req, res) => {
     const activites = await findAllActivites();
     res.status(200).json(activites);
 }
 
-let findByFilters = async (req, res) => {
+let getById = async (req, res) => {
+    const activite = await findActiviteById(req.query.activiteId);
+    res.status(200).json(activite);
+}
+
+let getByFilters = async (req, res) => {
     req.query.titre = req.query.titre === 'undefined' ? null : req.query.titre;
     req.query.ville = req.query.ville === 'undefined' ? null : req.query.ville;
     req.query.type = req.query.type === 'undefined' ? null : req.query.type;
     const activites = await findActivitesByFilters(
         req.query.titre, 
         req.query.ville, 
-        req.query.type);
+        req.query.type,
+        req.query.latMin, 
+        req.query.latMax, 
+        req.query.longMin, 
+        req.query.longMax
+    );
     res.status(200).json(activites);
 }
 
@@ -117,9 +132,20 @@ let uploadImages = async (req, res) => {
     res.status(200).json(updatedActivite);
 }
 
+let deletionImageFromFront = async (req, res) => {
+    const activite = await findLieuById(req.query.activiteId);
+    deleteImage(activite.images[parseInt(req.query.indexImage)]);
+    activite.images.splice(parseInt(req.query.indexImage), 1);
+    const updatedActivite = await findByIdAndUpdate(req.query.logementId, activite);
+    res.status(200).json(updatedActivite);
+}
+
 module.exports = {
     create,
     uploadImages,
     getAll,
-    findByFilters
+    getByFilters,
+    getById,
+    deletionImageFromFront,
+    updateActivite
 }

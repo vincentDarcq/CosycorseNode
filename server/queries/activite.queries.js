@@ -26,11 +26,13 @@ let findActiviteByIdAndUpdate = (id, activite) => {
     return Activite.findByIdAndUpdate({ _id: id }, activite, {new: true})
 }
 
-let findActivitesByFilters = (titre, ville, type) => {
+let findActivitesByFilters = (titre, ville, type, latMin, latMax, longMin, longMax) => {
     return Activite.find({
         titre: titre ? { $regex: titre, $options : 'i' } : {$exists: true},
         ville: ville ? ville : {$exists: true},
-        type: type ? type : {$exists: true}
+        type: type ? type : {$exists: true},
+        latitude: latMax & latMin ? { $lte: latMax, $gte: latMin } : {$exists: true}, 
+        longitude: longMax & longMin ? { $lte: longMax, $gte: longMin } : {$exists: true}
     });
 }
 

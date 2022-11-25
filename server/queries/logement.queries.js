@@ -34,8 +34,7 @@ let getLogementsByVilleRecentToOld = (ville) => {
   return Logement.find({ ville: ville, exposer: true}).sort({createdAt: -1}).exec();
 }
 
-let getLogementsByFiltres = (
-  ville, voyageurs, lits, sdbs, prix_max, equipements, latMin, latMax, longMin, longMax) => {
+let getLogementsByFiltres = (ville, voyageurs, lits, sdbs, prix_max, equipements, latMin, latMax, longMin, longMax) => {
   return Logement.find({
      ville: ville ? ville : {$exists: true}, 
      voyageurs: voyageurs ? {$gte : voyageurs} : {$exists: true},

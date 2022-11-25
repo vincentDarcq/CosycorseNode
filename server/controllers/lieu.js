@@ -14,7 +14,7 @@ let create = async (req, res) => {
 }
 
 let updateLieu = async (req, res) => {
-    const lieuUpdated = await findByIdAndUpdate(req.query.lieuId, lieu);
+    const lieuUpdated = await findByIdAndUpdate(req.query.lieuId, req.body);
     res.status(200).json(lieuUpdated);
 }
 
@@ -35,7 +35,12 @@ let findByFilters = async (req, res) => {
     const lieux = await findLieuxByFilters(
         req.query.nom, 
         req.query.ville, 
-        req.query.type);
+        req.query.type,
+        req.query.latMin, 
+        req.query.latMax, 
+        req.query.longMin, 
+        req.query.longMax
+    );
     res.status(200).json(lieux);
 }
 
