@@ -76,10 +76,11 @@ let resetPass = async (req, res) => {
   }
 }
 
-let editPass = async (req, res) => {
+let editPass = async (req, res, next) => {
   try {
-    getUserByMail(req.body.email).exec((err, user) => {
-      if (user && bcrypt.compareSync(req.body.oldPass, user.password)) {
+    findUserByMail(req.body.email, next).exec((err, user) => {
+      if(err){res.status(500).json(err)}
+      else if (user && bcrypt.compareSync(req.body.oldPass, user.password)) {
         editUserPass(req.body.email, bcrypt.hashSync(req.body.newPass, bcrypt.genSaltSync(8))).exec((err, user) => {
           if (err) { res.status(500).json(error_pwd_changed); }
           res.status(200).json(user);

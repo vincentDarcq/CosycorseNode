@@ -5,7 +5,7 @@ const {
     findLogementReservationsAcceptedAndNotPayed, 
     updateLogementReservation
 } = require('../queries/logement_reservation.queries');
-const { getUserByMail } = require('../queries/user.queries');
+const { findUserByMail } = require('../queries/user.queries');
 const { getDateFromStringDate } = require('../utils/dates');
 
 const { 
@@ -28,8 +28,8 @@ let transfertOnHostAccountForStartedReservations = async () => {
         const jours = (dd.getTime() - now.getTime())/1000/3600/24;
         if(jours < 0){
             try {
-                const annonceur = await getUserByMail(logRes.emailAnnonceur);
-                const demandeur = await getUserByMail(logRes.emailDemandeur);
+                const annonceur = await findUserByMail(logRes.emailAnnonceur);
+                const demandeur = await findUserByMail(logRes.emailDemandeur);
                 const logement = await getLogementById(logRes.logementId);
                 await stripe.transfers.create({
                     amount: logRes.prix * (10000/110),

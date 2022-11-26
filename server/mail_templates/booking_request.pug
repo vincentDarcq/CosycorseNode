@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    p Vous avez une demande de réservation :
+    p dates : #{dateDebut} - #{dateFin}
+    p #{message}
+    p Vous pouvez contacter le demandeur à l'adresse : #{emailDemandeur}
+    p Vous pouvez accepter ou refuser sur votre compte (vous devrez vous identifier avant): 
+    a(href=`${url}/mon_compte`) Mon compte
+    p Ou directement par ici (sans vous identifier):
+    a(href=`${url}/reponseLogementReservation/${lrId}`) Accepter/Refuser

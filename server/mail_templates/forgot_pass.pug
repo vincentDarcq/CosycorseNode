@@ -1,0 +1,6 @@
+extends layout
+
+block content
+    p Vous pouvez changer votre mot de passe en cliquant sur le lien suivant :
+    a(href=`${url}/reset_password/${token}`) Changer mon mot de passe
+    p Attention, ce lien n'est valable que 15 minutes
