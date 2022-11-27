@@ -8,7 +8,7 @@ const {
 } = require('../queries/logement_reservation.queries');
 
 const {
-    getLogementById
+    getLogementById, findByIdAndUpdate
 } = require('../queries/logement.queries');
 
 const { 
@@ -17,39 +17,85 @@ const {
 
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 
-const { newRemboursement } = require('../models/remboursement_stripe.model');
-const { createRemboursement } = require('../queries/remboursement.queries');
+const { 
+    createRemboursement 
+} = require('../queries/remboursement.queries');
 const { 
     cancelation_not_possible_after_48h, 
-    not_cancel_because_empty_message 
+    not_cancel_because_empty_message, 
+    invalides_dates_for_reservation
 } = require('../utils/reponses');
+const { getDateFromStringDate } = require('../utils/dates');
 
 let create = async (req, res, next) => {
-    res.locals.lr =  await saveLogementReservation(req);
-    next();
+    try {
+        const logement = await getLogementById(req.body.logementId);
+        if(!logement.exposer){
+            res.status(409).json(logement_not_available);
+        }else {
+            const reservations = await findReservationsBylogementId(req.body.logementId);
+            const dd = getDateFromStringDate(req.body.dateDebut);
+            const df = getDateFromStringDate(req.body.dateFin);
+            let invalid = false;
+            reservations.forEach(resa => {
+                const dateDebutResa = getDateFromStringDate(resa.dateDebut);
+                const dateFinResa = getDateFromStringDate(resa.dateFin);
+                if((dd.getTime() - df.getTime() === 0)
+                || (dd.getTime() - dateDebutResa.getTime() >= 0 && dd.getTime() - dateFinResa.getTime() <= 0) 
+                || (df.getTime() - dateDebutResa.getTime() >= 0 && df.getTime() - dateFinResa.getTime() <= 0)
+                || (dd.getTime() - dateDebutResa.getTime() <= 0 && df.getTime() - dateFinResa.getTime() >= 0)){
+                    invalid = true;
+                }
+            });
+            if(invalid){
+                res.status(409).json(invalides_dates_for_reservation);
+            }else {
+                res.locals.lr =  await saveLogementReservation(req);
+                next();
+            }
+        }
+    }catch(e){
+        res.status(500).json(e);
+    }
 }
 
 let getReservationsByLogementId = async (req, res, next) => {
-    const logementReservations = await findReservationsBylogementId(req.query.logementId);
-    res.status(200).json(logementReservations);
+    try {
+        const logementReservations = await findReservationsBylogementId(req.query.logementId);
+        res.status(200).json(logementReservations);
+    }catch(e){
+        res.status(500).json(e);
+    }
 }
 
 let getReservationsByEmailDemandeur = async (req, res, next) => {
-    const logementReservations = await findReservationsByEmailDemandeur(req.query.userEmail);
-    res.status(200).json(logementReservations);
+    try {
+        const logementReservations = await findReservationsByEmailDemandeur(req.query.userEmail);
+        res.status(200).json(logementReservations);
+    }catch(e){
+        res.status(500).json(e);
+    }
 }
 
 let getReservationsByEmailAnnonceur = async (req, res, next) => {
-    const logementReservations = await findReservationsByEmailAnnonceur(req.query.userEmail);
-    res.status(200).json(logementReservations);
+    try {
+        const logementReservations = await findReservationsByEmailAnnonceur(req.query.userEmail);
+        res.status(200).json(logementReservations);
+    }catch(e){
+        res.status(500).json(e);
+    }
 }
 
 let getReservationByLogementReservationId = async (req, res, next) => {
-    const logementReservation = await getLogementReservationById(req.query.logementReservationId);
-    if(logementReservation){
-        res.status(200).json(logementReservation);
-    }else {
-        res.status(404).json({});
+    try {
+        const logementReservation = await getLogementReservationById(req.query.logementReservationId);
+        if(logementReservation){
+            res.status(200).json(logementReservation);
+        }else {
+            res.status(404).json({});
+        }
+    }catch(e){
+        res.status(500).json(e);
     }
 }
 
@@ -115,8 +161,7 @@ let cancelReservation = async (req, res, next) => {
                 refund = await refundCustomer(logement, lr, 'customer', req.body.message);
             }
             lr.status = "annulée";
-            console.log(lr);
-            createRemboursement(newRemboursement(refund));
+            await createRemboursement(refund);
             updateLogementReservation(lr);
             next();
         }else {

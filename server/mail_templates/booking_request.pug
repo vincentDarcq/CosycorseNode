@@ -5,7 +5,7 @@ block content
     p dates : #{dateDebut} - #{dateFin}
     p #{message}
     p Vous pouvez contacter le demandeur à l'adresse : #{emailDemandeur}
-    p Vous pouvez accepter ou refuser sur votre compte (vous devrez vous identifier avant): 
+    p Vous pouvez accepter ou refuser en vous connectant à votre compte: 
     a(href=`${url}/mon_compte`) Mon compte
-    p Ou directement par ici (sans vous identifier):
+    p Ou directement par ici:
     a(href=`${url}/reponseLogementReservation/${lrId}`) Accepter/Refuser

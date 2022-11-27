@@ -13,6 +13,8 @@ const responses = {
     not_cancel_because_empty_message: `Votre message était vide, l'annulation n'a pas abouti`,
     cancelation_not_possible_after_48h: `Une annulation n'est possible que 48h à l'avance, vous avez passé ce délais`,
     adresse_not_in_corse: `Cette adresse n'est pas en Corse`,
+    logement_not_available: `Vous ne pouvez pas faire de réservation pour ce logement`,
+    invalides_dates_for_reservation: `Les dates sélectionnées sont indisponibles pour ce logement`,
     logement_reservation_not_started_while_user_deletion_asked:
     `Vous avez au moins un voyageur qui n'a pas encore commencé son voyage, 
     vous ne pouvez supprimer votre compte que lorsque vous n'avez plus de réservations à venir.`

@@ -153,7 +153,7 @@ let generateTokenForCreateReservation = async (req, res, next) => {
   const token = jwt.sign({}, RSA_KEY_PRIVATE, {
     algorithm: 'RS256',
     subject: auth,
-    expiresIn: '2s'
+    expiresIn: '6s'
   });
   res.status(200).json(token);
 }
