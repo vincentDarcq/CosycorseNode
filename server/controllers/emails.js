@@ -1,11 +1,22 @@
 const nodeMailer = require('nodemailer');
+const env = require(`../environment/${process.env.NODE_ENV}`);
+const { pugEngine } = require("nodemailer-pug-engine");
 const {
   user,
   password
 } = require('../rsa/nodemailerpass');
-const { findUserByMail } = require('../queries/user.queries');
-const env = require(`../environment/${process.env.NODE_ENV}`);
-const { pugEngine } = require("nodemailer-pug-engine");
+const { 
+  findUserByMail
+} = require('../queries/user.queries');
+const { 
+  reservation_accepted,
+  mail_sent_successfully,
+  mail_reservation_rejected,
+  demande_envoyee_success,
+  email_to_your_address,
+  email_annulation_to_host,
+  email_annulation_to_traveler
+} = require('../utils/reponses');
 
 const transporter = nodeMailer.createTransport({
   host: 'smtp.gmail.com',
@@ -47,7 +58,7 @@ let contactHost = async (req, res, next) => {
       return res.status(500).json(error);;
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("mail sent succefully");
+    res.status(200).json(mail_sent_successfully);
   });
 }
 
@@ -62,7 +73,7 @@ let contact = async (req, res, next) => {
       return res.status(500).json(error);
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("mail sent succefully");
+    res.status(200).json(mail_sent_successfully);
   });
 }
 
@@ -77,7 +88,7 @@ let forgotPassword = async (req, res, next) => {
       return res.status(500).json(error);
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("Un email a été envoyé à votre adresse");
+    res.status(200).json(email_to_your_address);
   });
 }
 
@@ -96,7 +107,7 @@ let sendMailForBooking = async (req, res, next) => {
       return res.status(500).json(error);;
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("Demande envoyée avec succès");
+    res.status(200).json(demande_envoyee_success);
   });
 }
 
@@ -113,7 +124,7 @@ let sendConfirmationForLogementReservation = async (req, res, next) => {
       return res.status(500).json(error);
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("Un mail de confirmation a été envoyé au voyageur");
+    res.status(200).json(reservation_accepted);
   });
 }
 
@@ -128,7 +139,7 @@ let sendRejectionForLogementReservation = async (req, res, next) => {
       return res.status(500).json(error);
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("Un mail de refus a été envoyé au voyageur");
+    res.status(200).json(mail_reservation_rejected);
   });
 }
 
@@ -148,7 +159,7 @@ let sendCancelationFromTravelerForLogementReservation = async (req, res, next) =
       return res.status(500).json(error);
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("Un mail d'annulation vient d'être envoyé à l'hôte");
+    res.status(200).json(email_annulation_to_host);
   });
 }
 
@@ -166,7 +177,7 @@ let sendCancelationFromHostForLogementReservation = async (req, res, next) => {
       return res.status(500).json(error);
     }
     console.log('Message %s sent: %s', info.messageId, info.response);
-    res.status(200).json("Un mail d'annulation vient d'être envoyé au voyageur");
+    res.status(200).json(email_annulation_to_traveler);
   });
 }
 
