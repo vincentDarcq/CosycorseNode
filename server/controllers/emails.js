@@ -49,7 +49,7 @@ let mailOptions = (to, subject, template, context) => {
 let contactHost = async (req, res, next) => {
   const ctx = {
     message: req.body.message,
-    mail: req.body.mail
+    mail: req.body.from
   }
   let options = mailOptions(req.body.to, req.body.subject, 'contact_host', ctx);
 
